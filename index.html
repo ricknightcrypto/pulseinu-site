@@ -1,0 +1,40 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <meta charset="utf-8">
+    <title>Home</title>
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+    <button class="enableEthereumButton">Enable Ethereum</button>
+  </body>
+</html>
+
+<script>
+  console.log(Web3.modules)
+  // Add token
+  // https://docs.metamask.io/guide/registering-your-token.html#code-free-example
+  // Good overview - this is it
+  // https://blog.openreplay.com/interacting-with-smart-contracts-using-web3
+
+  const ethereumButton = document.querySelector('.enableEthereumButton');
+
+  ethereumButton.addEventListener('click', () => {
+    //Will Start the metamask extension
+    ethereum.request({ method: 'eth_requestAccounts' });
+  });
+
+
+  // var web3 = new Web3('http://localhost:7545');
+
+
+  // basic
+//   if (window.ethereum) {
+//   window.web3 = new Web3(window.ethereum);
+//   await window.ethereum.enable();
+// }
+
+
+</script>
