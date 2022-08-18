@@ -28,7 +28,7 @@
         display: flex;
         align-items: center;
         justify-content: space-evenly;
-        margin-top: 1%;
+        margin-top: 5%;
         padding-bottom: 1%;
         -moz-column-gap: 15%;
              column-gap: 15%;
@@ -55,6 +55,14 @@
       font-display: swap;
     }
 
+    @font-face {
+      font-family: 'Poppins';
+	    src: url("/assets/fonts/PoppinsB.ttf");
+      font-weight: bold;
+    }
+
+    .connect-btn {}
+
   </style>
 </head>
 
@@ -62,17 +70,19 @@
   <div class="nav">
     <div class="logo">
       <img width="80" height="80" alt="navigation logo" class="img" src="/assets/images/pinu_small.png" />
-      PULSE INU
+      <span style="font-weight:bold">PULSE INU</span>
     </div>
     <div class="menu">
 
-      <div class="dim"></div>
+      <div class="telegram">
+        <img width="22" height="22" src="/assets/images/telegram.png" />
+      </div>
 
-      <div class="dim"></div>
+      <div class="twitter">
+        <img width="22" height="22" src="/assets/images/twitter.png" />
+      </div>
 
-      <div class="twitter"></div>
-
-      <button class="claim">Connect & Claim</button>
+      <button class="connect-btn">Connect & Claim</button>
     </div>
   </div>
 
