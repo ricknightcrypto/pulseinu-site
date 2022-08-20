@@ -77,7 +77,16 @@
       box-shadow: 0px 0px 52px rgba(204, 19, 236, 0.46);
       color: white;
       font-weight: bold;
+    }
 
+    @media (max-width: 800px) {
+      .nav, .menu, .logo {
+        flex-direction: column;
+      }
+
+      .logo {
+          margin-bottom: 20px;
+      }
     }
 
   </style>
@@ -103,13 +112,10 @@
     </div>
   </div>
 
-
   <div style="display:none">
     <button onclick="init()" class="enableEthereumButton">Enable Ethereum</button>
     <button onclick="mintToken()" class="mintToken">Mint Token</button>
   </div>
-
-
 
 </body>
 
