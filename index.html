@@ -62,7 +62,7 @@
       text-align: center;
       font-weight: bold;
       font-size: 39px;
-      margin-top: 6%;
+      margin-top: 4%;
       color: #D7E0FF;
     }
 
@@ -70,7 +70,7 @@
       text-align: center;
       text-align: center;
       margin-top: 4%;
-      font-size: 20px;
+      font-size: 25px;
       color: #D7E0FF;
     }
 
@@ -78,6 +78,8 @@
       text-align: center;
       font-weight: bold;
       margin-top: 4%;
+      display: flex;
+      justify-content: space-evenly;
     }
 
     @font-face {
@@ -115,6 +117,45 @@
       font-size: 25px;
     }
 
+    button.mint-btn {
+      border-radius: 100rem;
+      font-size: 25px;
+      padding: .5rem 3rem;
+      color: white;
+      box-shadow: 0 0 6px 0 rgba(157, 96, 212, 0.5);
+      border: solid 3px transparent;
+      background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), linear-gradient(0.25turn, #FF0000, #F00F8E, #4F30FF, #00E8FC);
+      background-origin: border-box;
+      background-clip: content-box, border-box;
+      box-shadow: 2px 1000px 1px black inset;
+      font-weight: bold;
+    }
+
+    button.mint-btn:hover {
+      box-shadow: none;
+      color: white
+    }
+
+    .chart-container {
+      text-align: center;
+    }
+
+    .exclusive {
+      color: #f00f8e;
+    }
+
+    .pump-harder {
+      color: #f60954;
+    }
+
+    .store-of-val {
+      margin-bottom: 10%;
+    }
+
+    .benefits {
+      font-size: 20px;
+    }
+
     @media (max-width: 800px) {
       .nav, .menu, .logo {
         flex-direction: column;
@@ -125,6 +166,20 @@
       }
     }
 
+    /* Style Bulleted List */
+
+    ul {
+      list-style: none; /* Remove default bullets */
+    }
+
+    ul li::before {
+      content: "\2022";
+      color: #04defc;
+      font-weight: bold;
+      display: inline-block;
+      width: 2em;
+      margin-left: -1em;
+    }
   </style>
 </head>
 
@@ -155,12 +210,89 @@
 
   <div class="subheader">
     A new meme coin and <u>buy and burn dex</u> on Pulsechain. Better pumpamentals<br>
-    than PulseDoge, Doge or the original Shiba Inu.
+    than PulseDoge, Doge or the original Shiba Inu. <br>
+    Burns Hex & PINU
   </div>
 
   <div class="action_buttons">
     <button class="connect-btn-lg">Claim Airdrop</button>
+    <button class="mint-btn">Mint PINU</button>
+  </div>
+
+  <div class="header">
+    Based on the HIGHEST appreciating <br>
+    meme coin ever: <img src="/assets/images/shib.png">
+    Shiba Inu
+  </div>
+
+  <div class="subheader">
+    Shib Pumped Harder than Doge!
+    <b>
+      <span class="pump-harder">Pulse Inu can pump harder than PulseDoge.</span>
+    </b><br>
+    Don't miss out.
+  </div>
+
+  <div class="chart-container">
+    <img src="/assets/images/roi_chart.png">
+  </div>
+
+  <div class="header store-of-val">
+    Well known store of value brand with the highest <br> price appreciation of ANY crypto, even Hex.
+  </div>
+
+  <div style="text-align: center;">
+    <h1>Superior Launch Model & Pumpamentals to Other Memecoins.</h1>
+  </div>
+
+  <div class="benefits">
+    <ul>
+      <li>Buy & Burn Dex</li>
+      <li>Fair launch: no whale allocations</li>
+    </ul>
+  </div>
+
+  <div style="text-align: center;">
+    <h1>
+      <span class="exclusive">A Pulsechain Exclusive</span>
+    </h1>
+    <div style="font-size:20px;">
+      No multi chain confusion or dump potential. <br>
+      Pulse Inu is only available on Pulse Chain via a Liquidity pool after the claim phase is over. <br>
+      Well known store of value brand with the highest price appreciation of ANY crypto, even Hex.
+    </div>
+  </div>
+
+  <div style="text-align:center;"">
+     <img src="/assets/images/pulse_line.png">
+  </div>
+
+  <div style="text-align: center;">
+    <h1>An Ecosystem of Projects</h1>
+    <div style="font-size:20px;">
+      Shib was the first meme coin to go beyond speculation. <br>
+      With a DEX, NFTs, Liquidity mining and incentive tokens. <br>
+      Pulse Inu aims to follow the same path.
+    </div>
+  </div>
+
+  <div style="text-align: center;">
+    <h1>How does it work?</h1>
+
+    <div style="font-size:20px; ">
+      No sacrifice phase or complicated launch model.<br>
+      PINU is either claimed or minted, that's it. When the DEX launches it will burn <b>PINU & HEX</b></br>
+      there are no founder allocations.
+    </div>
+  </div>
+
+  <div class="action_buttons">
     <button class="connect-btn-lg">Claim Airdrop</button>
+    <button class="mint-btn">Mint PINU</button>
+  </div>
+
+  <div style="text-align: center;">
+     <img src="/assets/images/inu.png">
   </div>
 
   <div style="display:none">
