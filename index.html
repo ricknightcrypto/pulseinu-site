@@ -199,7 +199,7 @@
         <img width="22" height="22" src="/assets/images/twitter.png" />
       </div>
 
-      <button onclick="init()" class="connect-btn">Connect & Claim</button>
+      <button onclick="init()" class="connect-btn disconnected">Connect & Claim</button>
       <button class="connect-btn connected" style="display: none;"">Connected</button>
     </div>
   </div>
@@ -295,27 +295,16 @@
   <div style="text-align: center;">
      <img src="/assets/images/inu.png">
   </div>
-
-  <div style="display:none">
-    <button onclick="init()" class="enableEthereumButton">Enable Ethereum</button>
-    <button onclick="mintToken()" class="mintToken">Mint Token</button>
-  </div>
-
 </body>
 
 </html>
 
 <script>
-  // Add token
-  // https://docs.metamask.io/guide/registering-your-token.html#code-free-example
-  // Good overview - this is it
-  // https://blog.openreplay.com/interacting-with-smart-contracts-using-web3
-
-    var connectedBtn = document.getElementsByClassName('connected')[0];
-
     let selectedAccount;
     let pulseInuContract;
     let isInitialized = false
+    const connectedBtn = document.getElementsByClassName('connected')[0];
+    const disconnectedBtn = document.getElementsByClassName('disconnected')[0];
 
     // Initialize Connection to Metamask
     const init = async () => {
@@ -326,10 +315,6 @@
           .request({ method: 'eth_requestAccounts' })
           .then((accounts) => {
             selectedAccount = accounts[0];
-            console.log(`Selected account is ${selectedAccount}`);
-          })
-          .catch((err) => {
-            console.log(err);
           });
 
         window.ethereum.on('accountsChanged', function (accounts) {
@@ -339,8 +324,10 @@
 
           if (selectedAccount === undefined){
             connectedBtn.style.display = "none";
+            disconnectedBtn.style.display = "block";
           }  else {
             connectedBtn.style.display = "block";
+            disconnectedBtn.style.display = "none";
           }
         });
       }
@@ -352,12 +339,12 @@
       pulseInuContract = new web3.eth.Contract(PINU_ABI.abi, '0xF477e91B327BAA0685b098E8f00bc9Ce845e8b21') // add contract address on testnet);
       isInitialized = true;
 
-      var connectedBtn = document.getElementsByClassName('connected')[0];
-
       if (selectedAccount === undefined){
-            connectedBtn.style.display = "none";
+        connectedBtn.style.display = "none";
+        disconnectedBtn.style.display = "block";
       }  else {
-            connectedBtn.style.display = "block";
+        connectedBtn.style.display = "block";
+        disconnectedBtn.style.display = "none";
       }
     };
 
