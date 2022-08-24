@@ -199,7 +199,8 @@
         <img width="22" height="22" src="/assets/images/twitter.png" />
       </div>
 
-      <button class="connect-btn">Connect & Claim</button>
+      <button onclick="init()" class="connect-btn">Connect & Claim</button>
+      <button class="connect-btn connected" style="display: none;"">Connected</button>
     </div>
   </div>
 
@@ -305,29 +306,19 @@
 </html>
 
 <script>
-  console.log(Web3.modules)
   // Add token
   // https://docs.metamask.io/guide/registering-your-token.html#code-free-example
   // Good overview - this is it
   // https://blog.openreplay.com/interacting-with-smart-contracts-using-web3
-    const providerUrl = 'http://127.0.0.1:7545';
 
-    const web3 = new Web3(providerUrl) // local Ganache
-
-    // const ethereumButton = document.querySelector('.enableEthereumButton');
-
-    // ethereumButton.addEventListener('click', () => {
-    //   //Will Start the metamask extension
-    //   ethereum.request({ method: 'eth_requestAccounts' });
-    // });
+    var connectedBtn = document.getElementsByClassName('connected')[0];
 
     let selectedAccount;
     let pulseInuContract;
     let isInitialized = false
 
+    // Initialize Connection to Metamask
     const init = async () => {
-      console.log("init triggered");
-
       provider = window.ethereum;
 
       if (typeof provider !== 'undefined') {
@@ -343,18 +334,36 @@
 
         window.ethereum.on('accountsChanged', function (accounts) {
           selectedAccount = accounts[0];
-          console.log(`Selected account changed to ${selectedAccount}`);
+
+          var connectedBtn = document.getElementsByClassName('connected')[0];
+
+          if (selectedAccount === undefined){
+            connectedBtn.style.display = "none";
+          }  else {
+            connectedBtn.style.display = "block";
+          }
         });
       }
 
       const web3 = new Web3(provider);
+
       const networkId = await web3.eth.net.getId(); // ???
-      console.log("network id:", networkId);
+
       pulseInuContract = new web3.eth.Contract(PINU_ABI.abi, '0xF477e91B327BAA0685b098E8f00bc9Ce845e8b21') // add contract address on testnet);
       isInitialized = true;
+
+      var connectedBtn = document.getElementsByClassName('connected')[0];
+
+      if (selectedAccount === undefined){
+            connectedBtn.style.display = "none";
+      }  else {
+            connectedBtn.style.display = "block";
+      }
     };
 
-    const mintToken = async () => {
+    init();
+
+    const claimToken = async () => {
       if (!isInitialized) {
         await init();
       }
@@ -382,11 +391,19 @@
       let v = merkleTree.verify(proof, hashedAddress, rootHash)
       console.log("proof valid?", v) // returns true
 
-      // generate proof for selected account
+      // Generate proof for selected account
       // Clean up and put into function
 
       // return pulseInuContract.methods
       //   .claim(selectedAccount, proof)
       //   .send({from: selectedAccount})
     }
+
+    /***
+     *  mintToken
+     *  Mint a specified amount of tokens. Should only accept PLS
+     *  calls mint(plsAmount) where plsAmount is the amount of PLS minted
+    */
+    // const mintToken = async () => {}
+
 </script>
