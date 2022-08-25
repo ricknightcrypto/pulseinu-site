@@ -229,7 +229,6 @@
 </html>
 
 <script>
-    let selectedAccount;
     let pulseInuContract;
     let isInitialized = false
     const connectedBtn = document.getElementsByClassName('connected')[0];
@@ -243,15 +242,19 @@
             provider
                 .request({ method: 'eth_requestAccounts' })
                 .then((accounts) => {
-                    selectedAccount = accounts[0];
+                    if (accounts[0] === undefined) {
+                        connectedBtn.style.display = "none";
+                        disconnectedBtn.style.display = "block";
+                    } else {
+                        connectedBtn.style.display = "block";
+                        disconnectedBtn.style.display = "none";
+                    }
                 });
 
             window.ethereum.on('accountsChanged', function (accounts) {
-                selectedAccount = accounts[0];
-
                 var connectedBtn = document.getElementsByClassName('connected')[0];
 
-                if (selectedAccount === undefined) {
+                if (accounts[0] === undefined) {
                     connectedBtn.style.display = "none";
                     disconnectedBtn.style.display = "block";
                 } else {
@@ -259,21 +262,10 @@
                     disconnectedBtn.style.display = "none";
                 }
             });
-        }
 
-        const web3 = new Web3(provider);
-
-        const networkId = await web3.eth.net.getId(); // ???
-
-        pulseInuContract = new web3.eth.Contract(PINU_ABI.abi, '0xF477e91B327BAA0685b098E8f00bc9Ce845e8b21') // add contract address on testnet);
-        isInitialized = true;
-
-        if (selectedAccount === undefined) {
-            connectedBtn.style.display = "none";
-            disconnectedBtn.style.display = "block";
-        } else {
-            connectedBtn.style.display = "block";
-            disconnectedBtn.style.display = "none";
+            const web3 = new Web3(provider);
+            pulseInuContract = new web3.eth.Contract(PINU_ABI.abi, '0xF477e91B327BAA0685b098E8f00bc9Ce845e8b21') // add contract address on testnet);
+            isInitialized = true;
         }
     };
 
@@ -296,13 +288,12 @@
         console.log("root", rootHash);
 
         // 'Serverside' code
-        let address = addresses[0]
+        let address = addresses[0] // Hmmm? Should this be selected?
         let hashedAddress = keccak256(address)
         let proof = merkleTree.getHexProof(hashedAddress)
 
         console.log("proof:", proof);
 
-        debugger;
 
         let v = merkleTree.verify(proof, hashedAddress, rootHash)
         console.log("proof valid?", v) // returns true
@@ -310,9 +301,9 @@
         // Generate proof for selected account
         // Clean up and put into function
 
-        // return pulseInuContract.methods
-        //   .claim(selectedAccount, proof)
-        //   .send({from: selectedAccount})
+        return pulseInuContract.methods
+           .claim(selectedAccount, proof)
+           .send({from: selectedAccount})
     }
 
     /***
