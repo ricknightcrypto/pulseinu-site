@@ -221,8 +221,8 @@
 
             <button onclick="init()" class="connect-btn disconnected">Connect & Claim</button>
             <button class="connect-btn connected" style="display: none;"">Connected</button>
+        </div>
     </div>
-</div>
     {{ content }}
 </body>
 
@@ -264,7 +264,7 @@
             });
 
             const web3 = new Web3(provider);
-            pulseInuContract = new web3.eth.Contract(PINU_ABI.abi, '0xF477e91B327BAA0685b098E8f00bc9Ce845e8b21') // add contract address on testnet);
+            pulseInuContract = new web3.eth.Contract(PINU_ABI.abi, '0x14d39625EF804b7f2cf45C61b5b7744d2a579fec') // add contract address on testnet);
             isInitialized = true;
         }
     };
@@ -276,15 +276,21 @@
             await init();
         }
 
-        let addresses = [0xF1c19135C4C194c1E4B4049E0c1bF079CBe1117F]
+        let addresses = [
+            "0xF1c19135C4C194c1E4B4049E0c1bF079CBe1117F",
+            "0X5B38DA6A701C568545DCFCB03FCB875F56BEDDC4"
+        ]
 
         // Hash leaves
         let leaves = addresses.map(addr => keccak256(addr))
+
+        console.log("leaves", leaves[0])
 
         // Create tree
         let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
         let rootHash = merkleTree.getRoot().toString('hex')
 
+        console.log(merkleTree);
         console.log("root", rootHash);
 
         // 'Serverside' code
@@ -298,12 +304,13 @@
         let v = merkleTree.verify(proof, hashedAddress, rootHash)
         console.log("proof valid?", v) // returns true
 
-        // Generate proof for selected account
-        // Clean up and put into function
+        const callingAccount = window.ethereum._state.accounts[0]
 
-        return pulseInuContract.methods
-           .claim(selectedAccount, proof)
-           .send({from: selectedAccount})
+        console.log('calling account', callingAccount);
+
+        pulseInuContract.methods
+            .claim(callingAccount, proof)
+            .send({from: callingAccount})
     }
 
     /***
