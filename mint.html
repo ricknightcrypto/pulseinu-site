@@ -25,6 +25,10 @@ layout: default
         }
     });
 
+    const PINU_PER_PULSE = 10000000;
+
+    // TODO: Add Popup confirmation
+
     /* Conversion */
 
     /* event listener */
@@ -33,7 +37,7 @@ layout: default
     /* function */
     function doThing(){
         console.log("Value:", this.value);
-        document.getElementsByName("pinuAmount")[0].value = this.value;
+        document.getElementsByName("pinuAmount")[0].value = this.value * PINU_PER_PULSE;
         // alert('Horray! Someone wrote "' + this.value + '"!');
     }
 
