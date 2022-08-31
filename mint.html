@@ -7,15 +7,37 @@ layout: default
 </div>
 
 <div class="mint-pinu">
+
     <form class="mint-form">
-        <input type="text" id="username" name="username">
-        <input type="password" id="pwd" name="pwd">
+        <input type="number" pattern="[0-9]" id="plsAmount" name="plsAmount">
+        <input type="number" id="pinuAmount" name="pinuAmount" disabled>
     </form>
 
     <button onclick="mintPINU()" class="mint-btn">Mint PINU</button>
 </div>
 
 <script>
+    /* Prevent submission of Numbers into form field */
+    document.querySelector("input").addEventListener("keypress", function (evt) {
+        if (evt.which < 48 || evt.which > 57)
+        {
+            evt.preventDefault();
+        }
+    });
+
+    /* Conversion */
+
+    /* event listener */
+    document.getElementsByName("plsAmount")[0].addEventListener('keyup', doThing);
+
+    /* function */
+    function doThing(){
+        console.log("Value:", this.value);
+        document.getElementsByName("pinuAmount")[0].value = this.value;
+        // alert('Horray! Someone wrote "' + this.value + '"!');
+    }
+
+
     /***
      *  mintToken
      *  Mint a specified amount of tokens. Should only accept PLS
