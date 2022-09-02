@@ -23,8 +23,8 @@ layout: default
         </div>
 
         <div class="mint-prompt-2">
-            For <span class="plsAmount">0</span><img width="20" height="20" class="img" src="/assets/images/pls_logo.png" /> you will receive
-            <span class="pinuAmount">0</span> <img width="20" height="20" class="img" src="/assets/images/pinu_small.png" />
+            For <span class="plsAmount">0</span><img width="20" height="20" class="img" src="assets/images/pls_logo.png" /> you will receive
+            <span class="pinuAmount">0</span> <img width="20" height="20" class="img" src="assets/images/pinu_small.png" />
         </div>
 
         <button onclick="mintPINU()" class="mint-btn">Mint PINU</button>
@@ -41,7 +41,7 @@ layout: default
         }
     });
 
-    /* Conversion */
+    /* Conversion Rate */
     const PINU_PER_PULSE = 10000000;
 
     document.getElementsByName("plsAmount")[0].addEventListener('keyup', updatePinuMint);
@@ -53,9 +53,12 @@ layout: default
     }
 
     /***
-     *  mintToken
+     *  mintPinu
      *  Mint a specified amount of tokens. Should only accept PLS
      *  calls mint(plsAmount) where plsAmount is the amount of PLS minted
     */
-    // const mintToken = async () => {}
+    const mintToken = async () => {
+
+
+    }
 </script>
