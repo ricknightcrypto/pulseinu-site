@@ -57,8 +57,22 @@ layout: default
      *  Mint a specified amount of tokens. Should only accept PLS
      *  calls mint(plsAmount) where plsAmount is the amount of PLS minted
     */
-    const mintToken = async () => {
+    const mintPINU= async () => {
+        if (!isInitialized) {
+            await init();
+        }
+
+        const callingAccount = window.ethereum._state.accounts[0];
+        const plsAmount = document.getElementsByClassName("plsAmount")[0].innerHTML;
 
 
+        pulseInuContract.methods
+            .mint()
+            .send(
+                {
+                    from: callingAccount,
+                    value: plsAmount
+                }
+            );
     }
 </script>
