@@ -7,14 +7,30 @@ layout: default
 </div>
 
 <div class="mint-pinu">
+    <div class="mint-form">
+        <form>
+            <input type="number" pattern="[0-9]" id="plsAmount" name="plsAmount">
+            <label for="plsAmount">PLS Amount</label><br>
+            <input type="number" id="pinuAmount" name="pinuAmount" disabled>
+            <label for="pinuAmount">PINU Amount</label><br>
+        </form>
+    </div>
 
-    <form class="mint-form">
-        <input type="number" pattern="[0-9]" id="plsAmount" name="plsAmount">
-        <input type="number" id="pinuAmount" name="pinuAmount" disabled>
-    </form>
+    <div style="text-align: left;">
+        <div class="mint-prompt-1">
+            <b>You will receive <span> 10,0000,000 </span> Pulse Inu (PINU)
+                for every PLS submitted.</b>
+        </div>
 
-    <button onclick="mintPINU()" class="mint-btn">Mint PINU</button>
+        <div class="mint-prompt-2">
+            For <span class="plsAmount">0</span><img width="20" height="20" class="img" src="/assets/images/pls_logo.png" /> you will receive
+            <span class="pinuAmount">0</span> <img width="20" height="20" class="img" src="/assets/images/pinu_small.png" />
+        </div>
+
+        <button onclick="mintPINU()" class="mint-btn">Mint PINU</button>
+    </div>
 </div>
+
 
 <script>
     /* Prevent submission of Numbers into form field */
@@ -25,22 +41,16 @@ layout: default
         }
     });
 
+    /* Conversion */
     const PINU_PER_PULSE = 10000000;
 
-    // TODO: Add Popup confirmation
+    document.getElementsByName("plsAmount")[0].addEventListener('keyup', updatePinuMint);
 
-    /* Conversion */
-
-    /* event listener */
-    document.getElementsByName("plsAmount")[0].addEventListener('keyup', doThing);
-
-    /* function */
-    function doThing(){
-        console.log("Value:", this.value);
+    function updatePinuMint(){
+        document.getElementsByClassName("plsAmount")[0].innerHTML = this.value;
+        document.getElementsByClassName("pinuAmount")[0].innerHTML = this.value * PINU_PER_PULSE;
         document.getElementsByName("pinuAmount")[0].value = this.value * PINU_PER_PULSE;
-        // alert('Horray! Someone wrote "' + this.value + '"!');
     }
-
 
     /***
      *  mintToken
