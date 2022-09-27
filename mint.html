@@ -31,7 +31,6 @@ layout: default
     </div>
 </div>
 
-
 <script>
     /* Prevent submission of Numbers into form field */
     document.querySelector("input").addEventListener("keypress", function (evt) {
@@ -64,7 +63,6 @@ layout: default
 
         const callingAccount = window.ethereum._state.accounts[0];
         const plsAmount = document.getElementsByClassName("plsAmount")[0].innerHTML;
-
 
         pulseInuContract.methods
             .mint()

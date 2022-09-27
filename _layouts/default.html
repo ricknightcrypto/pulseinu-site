@@ -14,6 +14,8 @@
     <meta name="description" content="SHIB Ecosystem On Pulsechain">
 
     <script src="pulseinu.js"></script>
+    <script src="freeclaim_addresses.js"></script>
+
     <meta charset="utf-8">
     <title>Pulse Inu</title>
 
@@ -305,7 +307,7 @@
             });
 
             const web3 = new Web3(provider);
-            pulseInuContract = new web3.eth.Contract(PINU_ABI.abi, '0xcE979C01192A8e1C3EFED5137803d0B837383004') // add contract address on testnet);
+            pulseInuContract = new web3.eth.Contract(PINU_ABI.abi, '0x43Fc366dAe88ad199D06C3050220e8f94315a370') // add contract address on testnet);
             isInitialized = true;
         }
     };
@@ -317,10 +319,9 @@
             await init();
         }
 
-        let addresses = [
-            "0xF1c19135C4C194c1E4B4049E0c1bF079CBe1117F",
-            "0X5B38DA6A701C568545DCFCB03FCB875F56BEDDC4"
-        ]
+        let addresses = F
+
+        debugger;
 
         // Hash leaves
         let leaves = addresses.map(addr => keccak256(addr))
