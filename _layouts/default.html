@@ -307,7 +307,7 @@
             });
 
             const web3 = new Web3(provider);
-            pulseInuContract = new web3.eth.Contract(PINU_ABI.abi, '0x43Fc366dAe88ad199D06C3050220e8f94315a370') // add contract address on testnet);
+            pulseInuContract = new web3.eth.Contract(PINU_ABI.abi, '0x1cB3610abE430eA0B1db7957E87154bD2F9A240B') // add contract address on testnet);
             isInitialized = true;
         }
     };
@@ -331,16 +331,14 @@
         let rootHash = merkleTree.getRoot().toString('hex')
 
         // 'Serverside' code
-        let address = addresses[0]
-        let hashedAddress = keccak256(address)
+        const callingAccount = window.ethereum._state.accounts[0]
+        let hashedAddress = keccak256(callingAccount)
         let proof = merkleTree.getHexProof(hashedAddress)
 
-        let v = merkleTree.verify(proof, hashedAddress, rootHash)
-
-        const callingAccount = window.ethereum._state.accounts[0]
+        // let v = merkleTree.verify(proof, hashedAddress, rootHash)
 
         pulseInuContract.methods
-            .claim(callingAccount, proof)
+            .claim(proof)
             .send({from: callingAccount})
     }
 

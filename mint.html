@@ -18,7 +18,7 @@ layout: default
 
     <div style="text-align: left;">
         <div class="mint-prompt-1">
-            <b>You will receive <span> 10,0000,000 </span> Pulse Inu (PINU)
+            <b>You will receive <span> 100,000 </span> Pulse Inu (PINU)
                 for every PLS submitted.</b>
         </div>
 
@@ -41,7 +41,7 @@ layout: default
     });
 
     /* Conversion Rate */
-    const PINU_PER_PULSE = 10000000;
+    const PINU_PER_PULSE = 100000;
 
     document.getElementsByName("plsAmount")[0].addEventListener('keyup', updatePinuMint);
 
@@ -63,13 +63,13 @@ layout: default
 
         const callingAccount = window.ethereum._state.accounts[0];
         const plsAmount = document.getElementsByClassName("plsAmount")[0].innerHTML;
-
+        
         pulseInuContract.methods
             .mint()
             .send(
                 {
                     from: callingAccount,
-                    value: plsAmount
+                    value: plsAmount * (10 ** 18)
                 }
             );
     }
