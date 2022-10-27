@@ -33,7 +33,7 @@ layout: default
 
 <script src='https://cdn.jsdelivr.net/npm/bignumber.js@9.1.0/bignumber.min.js'></script>
 <script>
-    /* Prevent submission of Numbers into form field */
+    /* Prevent submission of letters into form field */
     document.querySelector("input").addEventListener("keypress", function (evt) {
         if (evt.which < 48 || evt.which > 57)
         {
@@ -64,7 +64,7 @@ layout: default
 
         const callingAccount = window.ethereum._state.accounts[0];
         const plsAmount = document.getElementsByClassName("plsAmount")[0].innerHTML;
-        
+
         pulseInuContract.methods
             .mint()
             .send(
