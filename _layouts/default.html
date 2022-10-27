@@ -158,6 +158,7 @@
         }
 
         button.mint-btn {
+            height: 58px;
             border-radius: 100rem;
             font-size: 25px;
             padding: .5rem 3rem;
@@ -286,6 +287,7 @@
     const connectedBtn = document.getElementsByClassName('connected')[0];
     const disconnectedBtn = document.getElementsByClassName('disconnected')[0];
     const claimBtnsLg = document.getElementsByClassName('connect-btn-lg');
+    const notEligibleText = document.getElementsByClassName('not-eligible-text');
 
     // Initialize Connection to Metamask
     const init = async () => {
@@ -307,6 +309,16 @@
                     if (!F.includes(accounts[0]) && accounts[0] !== undefined) {
                         for (let btn of claimBtnsLg) {
                             btn.classList.add("disabled-claim-btn");
+                         }
+                        for (let txt of notEligibleText) {
+                            txt.style.display = "block";
+                        }
+                    } else {
+                        for (let btn of claimBtnsLg) {
+                            btn.classList.remove("disabled-claim-btn");
+                         }
+                        for (let txt of notEligibleText) {
+                            txt.style.display = "none";
                         }
                     }
                 });
@@ -326,11 +338,18 @@
                 if (!F.includes(accounts[0]) && accounts[0] !== undefined) {
                     for (let btn of claimBtnsLg) {
                         btn.classList.add("disabled-claim-btn");
-                     }
+                    }
+                    for (let txt of notEligibleText) {
+                        txt.style.display = "block";
+                    }
                 } else {
                     for (let btn of claimBtnsLg) {
                         btn.classList.remove("disabled-claim-btn");
-                     }
+                    }
+                    debugger;
+                    for (let txt of notEligibleText) {
+                        txt.style.display = "none";
+                    }
                 }
             });
 
