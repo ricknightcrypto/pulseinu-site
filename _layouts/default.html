@@ -151,6 +151,12 @@
             font-size: 25px;
         }
 
+        .disabled-claim-btn {
+            color: rgb(229, 226, 226);
+            background: rgb(82, 80, 80);
+            box-shadow: 0px 0px 52px rgba(233, 231, 233, 0.46);
+        }
+
         button.mint-btn {
             border-radius: 100rem;
             font-size: 25px;
@@ -272,10 +278,14 @@
 </html>
 
 <script>
+    // Handle two situations:
+    // If someone CAN claim and has -> Handle double claim error
+    // If someone CANNOT claim the button should be greyed out.
     let pulseInuContract;
     let isInitialized = false
     const connectedBtn = document.getElementsByClassName('connected')[0];
     const disconnectedBtn = document.getElementsByClassName('disconnected')[0];
+    const claimBtnsLg = document.getElementsByClassName('connect-btn-lg');
 
     // Initialize Connection to Metamask
     const init = async () => {
@@ -292,6 +302,13 @@
                         connectedBtn.style.display = "block";
                         disconnectedBtn.style.display = "none";
                     }
+
+                    // todo: put this into a function
+                    if (!F.includes(accounts[0]) && accounts[0] !== undefined) {
+                        for (let btn of claimBtnsLg) {
+                            btn.classList.add("disabled-claim-btn");
+                        }
+                    }
                 });
 
             window.ethereum.on('accountsChanged', function (accounts) {
@@ -303,6 +320,17 @@
                 } else {
                     connectedBtn.style.display = "block";
                     disconnectedBtn.style.display = "none";
+                }
+
+                // todo: put this into a function
+                if (!F.includes(accounts[0]) && accounts[0] !== undefined) {
+                    for (let btn of claimBtnsLg) {
+                        btn.classList.add("disabled-claim-btn");
+                     }
+                } else {
+                    for (let btn of claimBtnsLg) {
+                        btn.classList.remove("disabled-claim-btn");
+                     }
                 }
             });
 
