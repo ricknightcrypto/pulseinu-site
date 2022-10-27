@@ -31,6 +31,7 @@ layout: default
     </div>
 </div>
 
+<script src='https://cdn.jsdelivr.net/npm/bignumber.js@9.1.0/bignumber.min.js'></script>
 <script>
     /* Prevent submission of Numbers into form field */
     document.querySelector("input").addEventListener("keypress", function (evt) {
@@ -69,7 +70,7 @@ layout: default
             .send(
                 {
                     from: callingAccount,
-                    value: plsAmount * (10 ** 18)
+                    value: BigNumber(plsAmount * (10 ** 18))
                 }
             );
     }
