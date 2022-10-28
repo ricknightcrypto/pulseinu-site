@@ -260,14 +260,13 @@
         </a>
         <div class="menu">
             <a href="https://t.me/+Z5uINrmzvE9lNjNh">
-                <div class="telegram">
-                    <img width="22" height="22" src="assets/images/telegram.png" />
-                </div>
+                <img width="22" style="display:block;" src="assets/images/telegram.png" />
             </a>
-            <a href="https://twitter.com/PulseInu">
-                <div class="twitter">
-                    <img width="22" height="22" src="assets/images/twitter.png" />
-                </div>
+            <a href="https://t.me/+Z5uINrmzvE9lNjNh">
+                <img width="22" style="display:block;" src="assets/images/twitter.png" />
+            </a>
+            <a href="https://t.me/+Z5uINrmzvE9lNjNh">
+                <img width="25" style="display:block;" src="assets/images/metamask.png" >
             </a>
 
             <button onclick="init()" class="connect-btn disconnected">Connect & Claim</button>
@@ -280,9 +279,6 @@
 </html>
 
 <script>
-    // Handle two situations:
-    // If someone CAN claim and has -> Handle double claim error
-    // If someone CANNOT claim the button should be greyed out.
     let pulseInuContract;
     let isInitialized = false
     const connectedBtn = document.getElementsByClassName('connected')[0];
