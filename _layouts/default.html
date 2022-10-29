@@ -13,9 +13,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="SHIB Ecosystem On Pulsechain">
 
-    <script aysnc src="pulseinu.js"></script>
-    <script async src="freeclaim_addresses.js"></script>
-    <script async src="utility_functions.js"></script>
+    <script aysnc src="assets/javascripts/pulseinu.js"></script>
+    <script async src="assets/javascripts/freeclaim_addresses.js"></script>
+    <script async src="assets/javascripts/utility_functions.js"></script>
 
     <meta charset="utf-8">
     <title>Pulse Inu</title>
@@ -377,11 +377,13 @@
         let hashedAddress = keccak256(callingAccount)
         let proof = merkleTree.getHexProof(hashedAddress)
 
-        // let v = merkleTree.verify(proof, hashedAddress, rootHash)
-
         pulseInuContract.methods
             .claimFreeClaimer(proof)
-            .send({from: callingAccount})
+            .send(
+                {
+                    from: callingAccount,
+                }
+            );
     }
 
 </script>
