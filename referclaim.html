@@ -8,12 +8,13 @@ layout: default
 
 <div class="claims">
     <!-- Add address that prevents -->
-    <button onclick="claimReferrT()" class="mint-btn">Referrer Claim</button>
+    <button onclick="claimReferr()" class="mint-btn">Referrer Claim</button>
     <button onclick="claimEarly()" class="mint-btn">Early Adopter Claim</button>
 
 </div>
 
 <script>
+    // Store Addresses as HASH
     const claimReferrer = async () => {
         if (!isInitialized) {
             await init();
@@ -34,7 +35,7 @@ layout: default
         let proof = merkleTree.getHexProof(hashedAddress)
 
         pulseInuContract.methods
-            .claimFreeClaimer(proof)
+            .claimFreeClaimer(proof, percent)
             .send(
                 {
                     from: callingAccount,
