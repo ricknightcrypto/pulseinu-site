@@ -1,0 +1,72 @@
+---
+layout: default
+---
+
+<div class="header">
+    Referrer & Early Adopter Claims <br>
+</div>
+
+<div class="claims">
+    <!-- Add address that prevents -->
+    <button onclick="claimReferrT()" class="mint-btn">Referrer Claim</button>
+    <button onclick="claimEarly()" class="mint-btn">Early Adopter Claim</button>
+
+</div>
+
+<script>
+    const claimReferrer = async () => {
+        if (!isInitialized) {
+            await init();
+        }
+
+        let addresses = F // referrer addresses
+
+        // Hash leaves
+        let leaves = addresses.map(addr => keccak256(addr))
+
+        // Create tree
+        let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
+        let rootHash = merkleTree.getRoot().toString('hex')
+
+        // 'Serverside' code
+        const callingAccount = window.ethereum._state.accounts[0]
+        let hashedAddress = keccak256(callingAccount)
+        let proof = merkleTree.getHexProof(hashedAddress)
+
+        pulseInuContract.methods
+            .claimFreeClaimer(proof)
+            .send(
+                {
+                    from: callingAccount,
+                }
+            );
+    }
+
+    const claimEarly = async () => {
+        if (!isInitialized) {
+            await init();
+        }
+
+        let addresses = F // early adopter addresses
+
+        // Hash leaves
+        let leaves = addresses.map(addr => keccak256(addr))
+
+        // Create tree
+        let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
+        let rootHash = merkleTree.getRoot().toString('hex')
+
+        // 'Serverside' code
+        const callingAccount = window.ethereum._state.accounts[0]
+        let hashedAddress = keccak256(callingAccount)
+        let proof = merkleTree.getHexProof(hashedAddress)
+
+        pulseInuContract.methods
+            .claimFreeClaimer(proof)
+            .send(
+                {
+                    from: callingAccount,
+                }
+            );
+    }
+</script>
