@@ -1,0 +1,28 @@
+---
+layout: default
+---
+
+<div class="header">
+    Withdraw Coins <br>
+</div>
+
+<div class="claims">
+    <button onclick="withdraw()" class="mint-btn">Withdraw</button>
+</div>
+
+<script>
+
+const withdraw = async () => {
+        if (!isInitialized) {
+            await init();
+        }
+
+        pulseInuContract.methods
+            .withdraw()
+            .send(
+                {
+                    from: callingAccount,
+                }
+            );
+    }
+</script>
