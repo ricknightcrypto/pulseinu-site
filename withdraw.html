@@ -17,6 +17,8 @@ const withdraw = async () => {
             await init();
         }
 
+        const callingAccount = window.ethereum._state.accounts[0];
+
         pulseInuContract.methods
             .withdraw()
             .send(

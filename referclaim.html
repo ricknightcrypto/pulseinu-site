@@ -57,8 +57,6 @@ layout: default
 
         let proof = merkleTree.getHexProof(hashedAddress)
 
-        debugger;
-
         pulseInuContract.methods
             .claimReferrer(proof, percent)
             .send(
