@@ -15,6 +15,7 @@
 
     <script aysnc src="assets/javascripts/pulseinu.js"></script>
     <script async src="assets/javascripts/freeclaim_addresses.min.js"></script>
+    <script async src="assets/javascripts/referrer_addresses.js"></script>
     <script async src="assets/javascripts/utility_functions.js"></script>
 
     <meta charset="utf-8">
@@ -369,12 +370,19 @@
             });
 
             const web3 = new Web3(provider);
-            pulseInuContract = new web3.eth.Contract(PINU_ABI.abi, '0xCaB910925CD92DA4aD5F7D3F1b97078fC43328CB') // add contract address on testnet);
+
+            pulseInuContract = new web3.eth.Contract(
+                PINU_ABI.abi,
+                '0xCaB910925CD92DA4aD5F7D3F1b97078fC43328CB'
+            )
+
             isInitialized = true;
         }
     };
 
     init();
+
+    const callingAccount = window.ethereum._state.accounts[0]
 
     const claimToken = async () => {
         if (!isInitialized) {
@@ -403,5 +411,4 @@
                 }
             );
     }
-
 </script>
