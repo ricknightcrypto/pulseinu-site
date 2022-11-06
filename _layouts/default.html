@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <script async src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
 
     <!-- Pull this into the project? -->
     <script async src="https://cdn.jsdelivr.net/npm/merkletreejs@latest/merkletree.js"></script>
@@ -381,8 +381,6 @@
     };
 
     init();
-
-    const callingAccount = window.ethereum._state.accounts[0]
 
     const claimToken = async () => {
         if (!isInitialized) {
