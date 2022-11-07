@@ -305,6 +305,8 @@
     const disconnectedBtn = document.getElementsByClassName('disconnected')[0];
     const claimBtnsLg = document.getElementsByClassName('connect-btn-lg');
     const notEligibleText = document.getElementsByClassName('not-eligible-text');
+    const referrerBtn = document.getElementById('claimReferrer');
+    const earlyBtn = document.getElementById('earlyAdopter');
 
     // Initialize Connection to Metamask
     const init = async () => {
@@ -338,6 +340,12 @@
                             txt.style.display = "none";
                         }
                     }
+
+                    if (dict[accounts[0]] == undefined) {
+                        referrerBtn.classList.add("disabled-claim-btn");
+                    } else {
+                        referrerBtn.classList.remove("disabled-claim-btn");
+                    }
                 });
 
             window.ethereum.on('accountsChanged', function (accounts) {
@@ -351,7 +359,6 @@
                     disconnectedBtn.style.display = "none";
                 }
 
-                // todo: put this into a function
                 if (!F.includes(accounts[0]) && accounts[0] !== undefined) {
                     for (let btn of claimBtnsLg) {
                         btn.classList.add("disabled-claim-btn");
@@ -366,6 +373,12 @@
                     for (let txt of notEligibleText) {
                         txt.style.display = "none";
                     }
+                }
+
+                if (dict[accounts[0]] == undefined) {
+                    referrerBtn.classList.add("disabled-claim-btn");
+                } else {
+                    referrerBtn.classList.remove("disabled-claim-btn");
                 }
             });
 
@@ -382,12 +395,24 @@
 
     init();
 
+    /***
+     * claimToken
+     * if the user is on the list of free claim eligible lists, allow
+     * the user to claim their 1,000,000,000 Pulse Inu tokens.
+     * calls claimFreeClaimer(proof)
+    ***/
     const claimToken = async () => {
         if (!isInitialized) {
             await init();
         }
 
         let addresses = F
+
+        const callingAccount = window.ethereum._state.accounts[0]
+
+        if (!addresses.includes(callingAccount)) {
+           return;
+        }
 
         // Hash leaves
         let leaves = addresses.map(addr => keccak256(addr))
@@ -396,8 +421,6 @@
         let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
         let rootHash = merkleTree.getRoot().toString('hex')
 
-        // 'Serverside' code
-        const callingAccount = window.ethereum._state.accounts[0]
         let hashedAddress = keccak256(callingAccount)
         let proof = merkleTree.getHexProof(hashedAddress)
 

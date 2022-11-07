@@ -7,9 +7,8 @@ layout: default
 </div>
 
 <div class="claims">
-    <!-- Add address that prevents -->
-    <button onclick="claimReferrer()" class="mint-btn">Referrer Claim</button>
-    <button onclick="claimEarly()" class="mint-btn">Early Adopter Claim</button>
+    <button onclick="claimReferrer()" id="claimReferrer" class="connect-btn-lg">Referrer Claim</button>
+    <button onclick="claimEarly()" id="earlyAdopter" class="connect-btn-lg" style="width: 270px;">Early Adopter Claim</button>
 </div>
 
 <script>
@@ -20,23 +19,8 @@ layout: default
 
         const callingAccount = window.ethereum._state.accounts[0]
 
-        // check if calling account is in the claim referrer set
-
-        // todo: put this into a function
-        if (!F.includes(accounts[0]) && accounts[0] !== undefined) {
-            for (let btn of claimBtnsLg) {
-                btn.classList.add("disabled-claim-btn");
-            }
-            for (let txt of notEligibleText) {
-                txt.style.display = "block";
-            }
-        } else {
-            for (let btn of claimBtnsLg) {
-                btn.classList.remove("disabled-claim-btn");
-            }
-            for (let txt of notEligibleText) {
-                txt.style.display = "none";
-            }
+        if (dict[callingAccount] == undefined) {
+           return;
         }
 
         // Get Percent
