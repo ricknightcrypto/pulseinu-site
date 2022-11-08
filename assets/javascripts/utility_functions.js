@@ -1,5 +1,5 @@
 // TODO: Constant here to be used everywhere
-const tokenAddress = "0xCaB910925CD92DA4aD5F7D3F1b97078fC43328CB";
+const tokenAddress = "0xd04F1f1D2861A6D023E328a7fCFc105fa4766012";
 const tokenSymbol = "PINU";
 const tokenDecimals = 12;
 const tokenImage = "https://pulseinu.org/assets/images/pinu_small.png";
