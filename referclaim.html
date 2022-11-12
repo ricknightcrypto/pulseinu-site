@@ -25,6 +25,7 @@ layout: default
 
         // Get Percent
         const percent = dict[callingAccount]
+
         const addresses = Object.keys(dict)
 
         let leafNodes = []
@@ -37,12 +38,12 @@ layout: default
         let merkleTree = new MerkleTree(leafNodes, keccak256, { sortPairs: true })
 
         // Get Proof
-        let hashedAddress = keccak256(callingAccount)
+        let hashedAddress = keccak256(callingAccount + percent)
 
         let proof = merkleTree.getHexProof(hashedAddress)
 
         pulseInuContract.methods
-            .claimReferrer(proof, percent)
+            .claimReferrer(proof, parseInt("0x" + percent, 16))
             .send(
                 {
                     from: callingAccount,
