@@ -14,10 +14,10 @@
     <meta name="description" content="SHIB Ecosystem On Pulsechain">
 
     <script aysnc src="assets/javascripts/pulseinu.js"></script>
-    <script src="assets/javascripts/freeclaim_addresses.min.js"></script>
-    <script async src="assets/javascripts/referrer_addresses.js"></script>
-    <script async src="assets/javascripts/early_adopters.js"></script>
-    <script async src="assets/javascripts/utility_functions.js"></script>
+    <script src="/assets/javascripts/freeclaim_addresses.min.js"></script>
+    <script async src="/assets/javascripts/referrer_addresses.js"></script>
+    <script async src="/assets/javascripts/early_adopters.js"></script>
+    <script async src="/assets/javascripts/utility_functions.js"></script>
 
     <meta charset="utf-8">
     <title>Pulse Inu</title>
@@ -333,14 +333,15 @@
                     if (!F.includes(accounts[0]) && accounts[0] !== undefined) {
                         for (let btn of claimBtnsLg) {
                             btn.classList.add("disabled-claim-btn");
-                         }
+                        }
                         for (let txt of notEligibleText) {
                             txt.style.display = "block";
                         }
                     } else {
                         for (let btn of claimBtnsLg) {
                             btn.classList.remove("disabled-claim-btn");
-                         }
+                        }
+
                         for (let txt of notEligibleText) {
                             txt.style.display = "none";
                         }
