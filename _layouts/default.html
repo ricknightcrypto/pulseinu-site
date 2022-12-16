@@ -14,8 +14,9 @@
     <meta name="description" content="SHIB Ecosystem On Pulsechain">
 
     <script aysnc src="assets/javascripts/pulseinu.js"></script>
-    <script async src="assets/javascripts/freeclaim_addresses.min.js"></script>
+    <script src="assets/javascripts/freeclaim_addresses.min.js"></script>
     <script async src="assets/javascripts/referrer_addresses.js"></script>
+    <script async src="assets/javascripts/early_adopters.js"></script>
     <script async src="assets/javascripts/utility_functions.js"></script>
 
     <meta charset="utf-8">
@@ -350,6 +351,12 @@
                     } else {
                         referrerBtn.classList.remove("disabled-claim-btn");
                     }
+
+                    if (ADOPTERS[accounts[0]] == undefined) {
+                        earlyBtn.classList.add("disabled-claim-btn");
+                    } else {
+                        earlyBtn.classList.remove("disabled-claim-btn");
+                    }
                 });
 
             window.ethereum.on('accountsChanged', function (accounts) {
@@ -383,6 +390,12 @@
                     referrerBtn.classList.add("disabled-claim-btn");
                 } else {
                     referrerBtn.classList.remove("disabled-claim-btn");
+                }
+
+                if (ADOPTERS[accounts[0]] == undefined) {
+                    earlyBtn.classList.add("disabled-claim-btn");
+                } else {
+                    earlyBtn.classList.remove("disabled-claim-btn");
                 }
             });
 

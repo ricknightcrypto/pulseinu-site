@@ -56,7 +56,7 @@ layout: default
              await init();
          }
 
-         let addresses = F // early adopter addresses
+         let addresses = ADOPTERS // early adopter addresses
 
          // Hash leaves
          // This could be done on page load - update
@@ -72,7 +72,7 @@ layout: default
          let proof = merkleTree.getHexProof(hashedAddress)
 
          pulseInuContract.methods
-             .claimFreeClaimer(proof)
+             .claimFirstAdopter(proof)
              .send(
                  {
                      from: callingAccount,
