@@ -51,31 +51,32 @@ layout: default
             );
     }
 
-    // const claimEarly = async () => {
-    //     if (!isInitialized) {
-    //         await init();
-    //     }
+     const claimEarly = async () => {
+         if (!isInitialized) {
+             await init();
+         }
 
-    //     let addresses = F // early adopter addresses
+         let addresses = F // early adopter addresses
 
-    //     // Hash leaves
-    //     let leaves = addresses.map(addr => keccak256(addr))
+         // Hash leaves
+         // This could be done on page load - update
+         let leaves = addresses.map(addr => keccak256(addr))
 
-    //     // Create tree
-    //     let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
-    //     let rootHash = merkleTree.getRoot().toString('hex')
+         // Create tree
+         let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
+         let rootHash = merkleTree.getRoot().toString('hex')
 
     //     // 'Serverside' code
-    //     const callingAccount = window.ethereum._state.accounts[0]
-    //     let hashedAddress = keccak256(callingAccount)
-    //     let proof = merkleTree.getHexProof(hashedAddress)
+         const callingAccount = window.ethereum._state.accounts[0]
+         let hashedAddress = keccak256(callingAccount)
+         let proof = merkleTree.getHexProof(hashedAddress)
 
-    //     pulseInuContract.methods
-    //         .claimFreeClaimer(proof)
-    //         .send(
-    //             {
-    //                 from: callingAccount,
-    //             }
-    //         );
-    // }
+         pulseInuContract.methods
+             .claimFreeClaimer(proof)
+             .send(
+                 {
+                     from: callingAccount,
+                 }
+             );
+     }
 </script>
