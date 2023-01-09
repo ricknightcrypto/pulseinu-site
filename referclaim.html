@@ -12,19 +12,19 @@ layout: default
 </div>
 
 <script>
+
     const claimReferrer = async () => {
         if (!isInitialized) {
             await init();
         }
 
-        const callingAccount = window.ethereum._state.accounts[0]
-
-        if (dict[callingAccount] == undefined) {
+        let callingAccount = window.ethereum._state.accounts[0]
+        if (callingAccount === undefined || getParameterCaseInsensitive(dict, callingAccount) == undefined) {
            return;
         }
 
         // Get Percent
-        const percent = dict[callingAccount]
+        const percent = getParameterCaseInsensitive(dict, callingAccount)
 
         const addresses = Object.keys(dict)
 
@@ -48,7 +48,12 @@ layout: default
                 {
                     from: callingAccount,
                 }
-            );
+            ).then((res) => {
+                console.log(res);
+                openModal('Claimed to your account successfully!', true);
+            }).catch((err) => {
+                openModal(err.message, false);
+            });
     }
 
      const claimEarly = async () => {
@@ -72,11 +77,16 @@ layout: default
          let proof = merkleTree.getHexProof(hashedAddress)
 
          pulseInuContract.methods
-             .claimFirstAdopter(proof)
-             .send(
-                 {
-                     from: callingAccount,
-                 }
-             );
+            .claimFirstAdopter(proof)
+            .send(
+                {
+                    from: callingAccount,
+                }
+            ).then((res) => {
+                console.log(res);
+                openModal('Claimed to your account successfully!', true);
+            }).catch((err) => {
+                openModal(err.message, false);
+            });
      }
 </script>

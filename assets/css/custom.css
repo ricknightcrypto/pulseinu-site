@@ -1,0 +1,12 @@
+.success-modal {
+    color: green;
+    word-wrap: break-word;
+    font-size: 2rem;
+    text-align: center;
+    font-weight: 800;
+}
+
+.fail-modal {
+    color: red;
+    word-wrap: break-word;
+}

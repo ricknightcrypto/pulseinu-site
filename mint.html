@@ -72,6 +72,11 @@ layout: default
                     from: callingAccount,
                     value: BigNumber(plsAmount * (10 ** 18))
                 }
-            );
+            ).then((res) => {
+                console.log(res);
+                openModal('Minted your PINU successfully!', true);
+            }).catch((err) => {
+                openModal(err.message, false);
+            });
     }
 </script>

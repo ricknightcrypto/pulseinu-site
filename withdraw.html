@@ -25,6 +25,11 @@ const withdraw = async () => {
                 {
                     from: callingAccount,
                 }
-            );
+            ).then((res) => {
+                console.log(res);
+                openModal('Withdrew to your account successfully!', true);
+            }).catch((err) => {
+                openModal(err.message, false);
+            });
     }
 </script>

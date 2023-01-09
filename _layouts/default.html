@@ -18,6 +18,10 @@
     <script async src="/assets/javascripts/referrer_addresses.js"></script>
     <script async src="/assets/javascripts/early_adopters.js"></script>
     <script async src="/assets/javascripts/utility_functions.js"></script>
+    <link rel="stylesheet" href="/assets/css/custom.css">
+    <link rel="stylesheet" href="/assets/css/tingle.min.css">
+    <script src="/assets/javascripts/tingle.min.js"></script>
+    <script src="/assets/javascripts/modal.js"></script>
 
     <meta charset="utf-8">
     <title>Pulse Inu</title>
@@ -313,6 +317,18 @@
     const referrerBtn = document.getElementById('claimReferrer');
     const earlyBtn = document.getElementById('earlyAdopter');
 
+    /**
+     * @param {Object} object
+     * @param {string} key
+     * @return {any} value
+     */
+    const getParameterCaseInsensitive = (object, key) => {
+        const asLowercase = key.toLowerCase();
+        return object[Object.keys(object)
+            .find(k => k.toLowerCase() === asLowercase)
+        ];
+    };
+
     // Initialize Connection to Metamask
     const init = async () => {
         provider = window.ethereum;
@@ -328,9 +344,8 @@
                         connectedBtn.style.display = "block";
                         disconnectedBtn.style.display = "none";
                     }
-
                     // todo: put this into a function
-                    if (!F.includes(accounts[0]) && accounts[0] !== undefined) {
+                    if (accounts[0] === undefined || F.findIndex( item => accounts[0].toString().toLowerCase() == item.toLowerCase() ) === -1) {
                         for (let btn of claimBtnsLg) {
                             btn.classList.add("disabled-claim-btn");
                         }
@@ -346,17 +361,20 @@
                             txt.style.display = "none";
                         }
                     }
-
-                    if (dict[accounts[0]] == undefined) {
-                        referrerBtn.classList.add("disabled-claim-btn");
-                    } else {
-                        referrerBtn.classList.remove("disabled-claim-btn");
+                    if(referrerBtn) {
+                        if (accounts[0] === undefined || getParameterCaseInsensitive(dict, accounts[0]) == undefined) {
+                            referrerBtn.classList.add("disabled-claim-btn");
+                        } else {
+                            referrerBtn.classList.remove("disabled-claim-btn");
+                        }
                     }
 
-                    if (ADOPTERS[accounts[0]] == undefined) {
-                        earlyBtn.classList.add("disabled-claim-btn");
-                    } else {
-                        earlyBtn.classList.remove("disabled-claim-btn");
+                    if(earlyBtn) {
+                        if (accounts[0] === undefined || ADOPTERS.findIndex( item => accounts[0].toString().toLowerCase() == item.toLowerCase() ) === -1) {
+                            earlyBtn.classList.add("disabled-claim-btn");
+                        } else {
+                            earlyBtn.classList.remove("disabled-claim-btn");
+                        }   
                     }
                 });
 
@@ -371,7 +389,7 @@
                     disconnectedBtn.style.display = "none";
                 }
 
-                if (!F.includes(accounts[0]) && accounts[0] !== undefined) {
+                if (accounts[0] === undefined || F.findIndex( item => accounts[0].toString().toLowerCase() == item.toLowerCase() ) === -1) {
                     for (let btn of claimBtnsLg) {
                         btn.classList.add("disabled-claim-btn");
                     }
@@ -386,25 +404,29 @@
                         txt.style.display = "none";
                     }
                 }
-
-                if (dict[accounts[0]] == undefined) {
-                    referrerBtn.classList.add("disabled-claim-btn");
-                } else {
-                    referrerBtn.classList.remove("disabled-claim-btn");
+                accounts[0] = accounts[0].toString().toLowerCase();
+                if(referrerBtn) {
+                    if (accounts[0] === undefined || getParameterCaseInsensitive(dict, accounts[0]) == undefined) {
+                        referrerBtn.classList.add("disabled-claim-btn");
+                    } else {
+                        referrerBtn.classList.remove("disabled-claim-btn");
+                    }
                 }
 
-                if (ADOPTERS[accounts[0]] == undefined) {
-                    earlyBtn.classList.add("disabled-claim-btn");
-                } else {
-                    earlyBtn.classList.remove("disabled-claim-btn");
+                if(earlyBtn) {
+                    if (accounts[0] === undefined || ADOPTERS.findIndex( item => accounts[0].toString().toLowerCase() == item.toLowerCase() ) === -1) {
+                        earlyBtn.classList.add("disabled-claim-btn");
+                    } else {
+                        earlyBtn.classList.remove("disabled-claim-btn");
+                    }
                 }
             });
 
             const web3 = new Web3(provider);
 
             pulseInuContract = new web3.eth.Contract(
-                PINU_ABI.abi,
-                '0x60D220D31AbDAd735CCB62b8Ecd10551e84540d5'
+                PINU_PARAM.abi,
+                PINU_PARAM.contractAddress
             )
 
             isInitialized = true;
@@ -428,8 +450,8 @@
 
         const callingAccount = window.ethereum._state.accounts[0]
 
-        if (!addresses.includes(callingAccount)) {
-           return;
+        if (callingAccount === undefined || addresses.findIndex( item => callingAccount.toString().toLowerCase() == item.toLowerCase() ) === -1) {
+            return;
         }
 
         // Hash leaves
@@ -442,12 +464,14 @@
         let hashedAddress = keccak256(callingAccount)
         let proof = merkleTree.getHexProof(hashedAddress)
 
+        // let v = merkleTree.verify(proof, hashedAddress, rootHash)
+
         pulseInuContract.methods
             .claimFreeClaimer(proof)
-            .send(
-                {
-                    from: callingAccount,
-                }
-            );
+            .send({from: callingAccount}).then((res) => {
+                console.log(res);
+            }).catch((err) => {
+                openModal(err.message, false);
+            });
     }
 </script>

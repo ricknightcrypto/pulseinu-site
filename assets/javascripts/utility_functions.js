@@ -1,5 +1,4 @@
 // TODO: Constant here to be used everywhere
-const tokenAddress = "0x60D220D31AbDAd735CCB62b8Ecd10551e84540d5";
 const tokenSymbol = "PINU";
 const tokenDecimals = 12;
 const tokenImage = "https://pulseinu.org/assets/images/pinu_small.png";
@@ -11,7 +10,7 @@ async function addTokenFunction() {
       params: {
         type: "ERC20",
         options: {
-          address: tokenAddress,
+          address: PINU_PARAM.contractAddress,
           symbol: tokenSymbol,
           decimals: tokenDecimals,
           image: tokenImage,
