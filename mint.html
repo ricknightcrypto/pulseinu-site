@@ -27,7 +27,11 @@ layout: default
             <span class="pinuAmount">0</span> <img width="20" height="20" class="img" src="assets/images/pinu_small.png" />
         </div>
 
-        <button onclick="mintPINU()" class="mint-btn">Mint PINU</button>
+        <div style="text-align: center; width: fit-content;">
+            <button onclick="mintPINU()" class="mint-btn mint-action-btn">Mint PINU</button>
+            <p style="font-size: 16px; font-weight: 400"></p>
+            <p style="font-size: 25px; font-weight: 900"></p>
+        </div>
     </div>
 </div>
 
@@ -58,9 +62,6 @@ layout: default
      *  calls mint(plsAmount) where plsAmount is the amount of PLS minted
     */
     const mintPINU = async () => {
-        if (!isInitialized) {
-            await init();
-        }
 
         if (!checkNetwork()) {
             return;

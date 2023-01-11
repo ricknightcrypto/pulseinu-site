@@ -7,15 +7,16 @@ layout: default
 </div>
 
 <div class="claims">
-    <button onclick="withdraw()" class="mint-btn">Withdraw</button>
+    <div>
+        <button onclick="withdraw()" class="mint-btn" id="withdrawBtn">Withdraw</button>
+        <p style="font-size: 16px; font-weight: 400"></p>
+        <p style="font-size: 25px; font-weight: 900"></p>
+    </div>
 </div>
 
 <script>
 
 const withdraw = async () => {
-        if (!isInitialized) {
-            await init();
-        }
 
         if (!checkNetwork()) {
             return;

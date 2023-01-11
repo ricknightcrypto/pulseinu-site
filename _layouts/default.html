@@ -163,12 +163,6 @@
             font-size: 25px;
         }
 
-        .disabled-claim-btn {
-            color: rgb(229, 226, 226);
-            background: rgb(82, 80, 80);
-            box-shadow: 0px 0px 52px rgba(233, 231, 233, 0.46);
-        }
-
         button.mint-btn {
             height: 58px;
             border-radius: 100rem;
@@ -187,6 +181,12 @@
         button.mint-btn:hover {
             box-shadow: none;
             color: white
+        }
+
+        .disabled-claim-btn {
+            color: rgb(229, 226, 226) !important;
+            background: rgb(82, 80, 80) !important;
+            box-shadow: 0px 0px 52px rgba(233, 231, 233, 0.46) !important;
         }
 
         .chart-container {
@@ -320,11 +320,15 @@
     let pulseInuContract;
     let callingAccount;
     let isInitialized = false
+    let contractInfo;
+    let countInterval = null;
     const connectedBtn = document.getElementsByClassName('connected')[0];
     const disconnectedBtn = document.getElementsByClassName('disconnected')[0];
-    const claimBtnsLg = document.getElementsByClassName('connect-btn-lg');
+    const claimBtnsLg = document.getElementsByClassName(' action-btn');
+    const mintBtns = document.getElementsByClassName('mint-action-btn');
     const notEligibleText = document.getElementsByClassName('not-eligible-text');
     const referrerBtn = document.getElementById('claimReferrer');
+    const withdrawBtn = document.getElementById('withdrawBtn');
     const earlyBtn = document.getElementById('earlyAdopter');
 
     /**
@@ -341,7 +345,7 @@
 
     const fetchError = (err, nocheck = false) => {
         if(!nocheck) {
-            if(err.indexOf('User denied transaction signature.') > -1) {
+            if(err.indexOf('User denied transaction signature.') > -1 || err.indexOf('loadingDefaults') > -1) {
                 err = 'User denied transaction.';
             } else {
                 if(err.indexOf('NOT_AIRDROP_CLAIMABLE_ADDR') > -1) {
@@ -382,7 +386,28 @@
         return network == REQUIRED_NETWORK_ID;
     };
 
+    const makeTimeString = (time) => {
+        if(time < 0) {
+            return '00:00:00';
+        }
+        let seconds = Math.floor(time / 1000);
+        let days = Math.floor(seconds / 3600 / 24);
+        let hours = Math.floor((seconds - days * 3600 * 24) / 3600);
+        let mins = Math.floor((seconds -  - days * 3600 * 24 - hours * 3600) / 60);
+        seconds = seconds - days * 3600 * 24 - hours * 3600 - mins * 60;
+        return (days > 1 ? days + ' days ' : days == 1 ? days + ' day ' : '') + (hours < 10 ? '0' + hours : hours) + ':' + (mins < 10 ? '0' + mins : mins) + ':' + (seconds < 10 ? '0' + seconds : seconds);
+    }
+
     const initButtonByAccount = (account) => {
+        if(claimBtnsLg.length === 0 && mintBtns.length === 0 && !referrerBtn && !earlyBtn && !withdrawBtn && countInterval !== null) {
+            clearInterval(countInterval);
+            countInterval = null;
+            return;
+        }
+
+        const airdropEndTime = Number(contractInfo?.airdropEndTime?._hex) * 1000;
+        const currentTime = new Date().getTime();
+        const mintEndTime = Number(contractInfo?.mintEndTime?._hex) * 1000;
         callingAccount = account;
         if (account === undefined) {
             connectedBtn.style.display = "none";
@@ -392,37 +417,115 @@
             disconnectedBtn.style.display = "none";
         }
         // todo: put this into a function
-        if (account === undefined || F.findIndex( item => account.toString().toLowerCase() == item.toLowerCase() ) === -1) {
+        if (!isInitialized || !contractInfo || account === undefined || F.findIndex( item => account.toString().toLowerCase() == item.toLowerCase() ) === -1) {
             for (let btn of claimBtnsLg) {
                 btn.classList.add("disabled-claim-btn");
+                btn.disabled = true;
             }
             for (let txt of notEligibleText) {
                 txt.style.display = "block";
             }
         } else {
             for (let btn of claimBtnsLg) {
-                btn.classList.remove("disabled-claim-btn");
+                if(airdropEndTime < currentTime) {
+                    btn.classList.add("disabled-claim-btn");
+                    btn.disabled = true;
+                } else {
+                    btn.classList.remove("disabled-claim-btn");
+                    btn.disabled = false;
+                }
+                btn.nextSibling.nextSibling.innerHTML = 'Ends in';
+                btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(airdropEndTime - currentTime);
             }
 
             for (let txt of notEligibleText) {
                 txt.style.display = "none";
             }
         }
+
+        if (!isInitialized || !contractInfo || account === undefined) {
+            for (let btn of mintBtns) {
+                btn.classList.add("disabled-claim-btn");
+                btn.disabled = true;
+            }
+        } else {
+            for (let btn of mintBtns) {
+                if(mintEndTime < currentTime) {
+                    btn.classList.add("disabled-claim-btn");
+                    btn.disabled = true;
+                } else {
+                    btn.classList.remove("disabled-claim-btn");
+                    btn.disabled = false;
+                }
+                btn.nextSibling.nextSibling.innerHTML = 'Ends in';
+                btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(mintEndTime - currentTime);
+            }
+
+            for (let txt of notEligibleText) {
+                txt.style.display = "none";
+            }
+        }
+
         if(referrerBtn) {
-            if (account === undefined || getParameterCaseInsensitive(dict, account) == undefined) {
+            if (!isInitialized || !contractInfo || account === undefined || getParameterCaseInsensitive(dict, account) == undefined) {
                 referrerBtn.classList.add("disabled-claim-btn");
+                referrerBtn.disabled = true;
             } else {
-                referrerBtn.classList.remove("disabled-claim-btn");
+                if(mintEndTime > currentTime) {
+                    referrerBtn.classList.add("disabled-claim-btn");
+                    referrerBtn.disabled = true;
+                } else {
+                    referrerBtn.classList.remove("disabled-claim-btn");
+                    referrerBtn.disabled = false;
+                }
+                referrerBtn.nextSibling.nextSibling.innerHTML = 'Starts in';
+                referrerBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(mintEndTime - currentTime);
+            }
+        }
+
+        if(withdrawBtn) {
+            if (!isInitialized || !contractInfo || account === undefined || getParameterCaseInsensitive(dict, account) == undefined) {
+                withdrawBtn.classList.add("disabled-claim-btn");
+                withdrawBtn.disabled = true;
+            } else {
+                if(mintEndTime > currentTime) {
+                    withdrawBtn.classList.add("disabled-claim-btn");
+                    withdrawBtn.disabled = true;
+                } else {
+                    withdrawBtn.classList.remove("disabled-claim-btn");
+                    withdrawBtn.disabled = false;
+                }
+                withdrawBtn.nextSibling.nextSibling.innerHTML = 'Possible in';
+                withdrawBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(mintEndTime - currentTime);
             }
         }
 
         if(earlyBtn) {
-            if (account === undefined || ADOPTERS.findIndex( item => account.toString().toLowerCase() == item.toLowerCase() ) === -1) {
+            if (!isInitialized || !contractInfo || account === undefined || ADOPTERS.findIndex( item => account.toString().toLowerCase() == item.toLowerCase() ) === -1) {
                 earlyBtn.classList.add("disabled-claim-btn");
+                earlyBtn.disabled = true;
             } else {
-                earlyBtn.classList.remove("disabled-claim-btn");
+                if(mintEndTime > currentTime) {
+                    earlyBtn.classList.add("disabled-claim-btn");
+                    earlyBtn.disabled = true;
+                } else {
+                    earlyBtn.classList.remove("disabled-claim-btn");
+                    earlyBtn.disabled = false;
+                }
+                earlyBtn.nextSibling.nextSibling.innerHTML = 'Starts in';
+                earlyBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(mintEndTime - currentTime);
             }   
         }
+    };
+
+    const getContractInfo = () => {
+        pulseInuContract
+            .contractInfo()
+            .then((res) => {
+                contractInfo = res;
+            }).catch((err) => {
+                console.log(err);
+            });
     };
     
     // Initialize Connection to Metamask
@@ -434,7 +537,9 @@
                 signer
                     .getAddress()
                     .then((account) => {
-                        initButtonByAccount(account);
+                        countInterval = setInterval(() => {
+                            initButtonByAccount(account);
+                        }, 1000);
                     }).catch((err) => {
                         console.log(err);
                     });
@@ -480,7 +585,7 @@
             )
 
             isInitialized = true;
-
+            getContractInfo();
         } else {
             document.getElementById('network_alert').innerHTML = 'Please install MetaMask!';
             document.getElementById('network_alert').setAttribute('network_id', -1);
@@ -496,19 +601,12 @@
      * calls claimFreeClaimer(proof)
     ***/
     const claimToken = async () => {
-        if (!isInitialized) {
-            await init();
-        }
         
         if (!checkNetwork()) {
             return;
         }
 
         let addresses = F
-
-        if (callingAccount === undefined || addresses.findIndex( item => callingAccount.toString().toLowerCase() == item.toLowerCase() ) === -1) {
-            return;
-        }
 
         // Hash leaves
         let leaves = addresses.map(addr => keccak256(addr))

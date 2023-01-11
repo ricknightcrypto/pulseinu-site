@@ -7,27 +7,31 @@ layout: default
 </div>
 
 <div class="claims">
-    <button onclick="claimReferrer()" id="claimReferrer" class="connect-btn-lg">Referrer Claim</button>
-    <button onclick="claimEarly()" id="earlyAdopter" class="connect-btn-lg" style="width: 270px;">Early Adopter Claim</button>
+    <div>
+        <button onclick="claimReferrer()" id="claimReferrer" class="connect-btn-lg">Referrer Claim</button>
+        <p style="font-size: 16px; font-weight: 400"></p>
+        <p style="font-size: 25px; font-weight: 900"></p>
+    </div>
+    <div>
+        <button onclick="claimEarly()" id="earlyAdopter" class="connect-btn-lg" style="width: 270px;">Early Adopter Claim</button>
+        <p style="font-size: 16px; font-weight: 400"></p>
+        <p style="font-size: 25px; font-weight: 900"></p>
+    </div>
 </div>
 
 <script>
 
     const claimReferrer = async () => {
-        if (!isInitialized) {
-            await init();
-        }
 
         if (!checkNetwork()) {
             return;
         }
 
-        if (callingAccount === undefined || getParameterCaseInsensitive(dict, callingAccount) == undefined) {
-           return;
-        }
-
         // Get Percent
-        const percent = getParameterCaseInsensitive(dict, callingAccount)
+        let percent = getParameterCaseInsensitive(dict, callingAccount)
+        if(percent == undefined) {
+            percent = 0;
+        }
 
         const addresses = Object.keys(dict)
 
@@ -54,35 +58,32 @@ layout: default
     }
 
      const claimEarly = async () => {
-         if (!isInitialized) {
-             await init();
-         }
 
-         if (!checkNetwork()) {
+        if (!checkNetwork()) {
             return;
         }
 
-         let addresses = ADOPTERS // early adopter addresses
+        let addresses = ADOPTERS // early adopter addresses
 
-         // Hash leaves
-         // This could be done on page load - update
-         let leaves = addresses.map(addr => keccak256(addr))
+        // Hash leaves
+        // This could be done on page load - update
+        let leaves = addresses.map(addr => keccak256(addr))
 
-         // Create tree
-         let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
-         let rootHash = merkleTree.getRoot().toString('hex')
+        // Create tree
+        let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
+        let rootHash = merkleTree.getRoot().toString('hex')
 
         // 'Serverside' code
-         let hashedAddress = keccak256(callingAccount)
-         let proof = merkleTree.getHexProof(hashedAddress)
+        let hashedAddress = keccak256(callingAccount)
+        let proof = merkleTree.getHexProof(hashedAddress)
 
-         pulseInuContract
-            .claimFirstAdopter(proof)
-            .then((res) => {
-                openModal('Claimed to your account successfully!', true);
-            }).catch((err) => {
-                console.log(err);
-                fetchError(err?.data?.message ? err?.data?.message : err?.message ? err?.message : 'Unable to Claim to your account!', false);
-            });
+        pulseInuContract
+        .claimFirstAdopter(proof)
+        .then((res) => {
+            openModal('Claimed to your account successfully!', true);
+        }).catch((err) => {
+            console.log(err);
+            fetchError(err?.data?.message ? err?.data?.message : err?.message ? err?.message : 'Unable to Claim to your account!', false);
+        });
      }
 </script>

@@ -1,0 +1,56 @@
+---
+layout: default
+---
+
+<div class="header">
+    Merkle Root <br>
+</div>
+
+<div class="claims">
+    <button onclick="airdropMerkle()" id="airdropMerkle" class="connect-btn-lg">Airdrop</button>
+    <button onclick="referrerMerkle()" id="referrerMerkle" class="connect-btn-lg" style="width: 270px;">Referrer</button>
+    <button onclick="adopterMerkle()" id="adopterMerkle" class="connect-btn-lg" style="width: 270px;">Early Adopter</button>
+</div>
+
+<script>
+
+    const airdropMerkle = async () => {
+
+        let addresses = F
+
+        // Hash leaves
+        let leaves = addresses.map(addr => keccak256(addr))
+
+        // Create tree
+        let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
+        openModal(merkleTree.getRoot().toString('hex'), true);
+    }
+
+    const referrerMerkle = async () => {
+
+        const addresses = Object.keys(dict)
+
+        let leafNodes = []
+
+        for (let i = 0; i < addresses.length; i++) {
+            leafNodes.push(keccak256(addresses[i] + dict[addresses[i]]))
+        }
+
+        // Create tree
+        let merkleTree = new MerkleTree(leafNodes, keccak256, { sortPairs: true })
+        openModal(merkleTree.getRoot().toString('hex'), true);
+    }
+
+    const adopterMerkle = async () => {
+
+        let addresses = ADOPTERS // early adopter addresses
+
+        // Hash leaves
+        // This could be done on page load - update
+        let leaves = addresses.map(addr => keccak256(addr))
+
+        // Create tree
+        let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
+        openModal(merkleTree.getRoot().toString('hex'), true);
+     }
+</script>
