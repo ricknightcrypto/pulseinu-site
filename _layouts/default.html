@@ -3,6 +3,10 @@
 
 <head>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script
+        src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"
+        type="application/javascript">
+    </script>
 
     <!-- Pull this into the project? -->
     <script async src="https://cdn.jsdelivr.net/npm/merkletreejs@latest/merkletree.js"></script>
@@ -273,8 +277,8 @@
 </head>
 
 <body>
-    <div class="testnet-banner">
-        Site not live until Pulsechain mainnet. Switch to Pulsechain testnet to use website.
+    <div class="testnet-banner" id="network_alert">
+        
     </div>
     <div class="nav">
         <a href="/">
@@ -308,7 +312,13 @@
 </html>
 
 <script>
+    let REQUIRED_NETWORK_ID = 941;
+    let REQUIRED_NETWORK_NAME = 'Pulsechain';
+    let REQUIRED_NETWORK = 'testnet';
+
+
     let pulseInuContract;
+    let callingAccount;
     let isInitialized = false
     const connectedBtn = document.getElementsByClassName('connected')[0];
     const disconnectedBtn = document.getElementsByClassName('disconnected')[0];
@@ -329,107 +339,151 @@
         ];
     };
 
+    const fetchError = (err, nocheck = false) => {
+        if(!nocheck) {
+            if(err.indexOf('User denied transaction signature.') > -1) {
+                err = 'User denied transaction.';
+            } else {
+                if(err.indexOf('NOT_AIRDROP_CLAIMABLE_ADDR') > -1) {
+                    err = "Your address isn't eligible to claim airdrop.";
+                } else if(err.indexOf('NOT_REFERRER_CLAIMABLE_ADDR_PERCENT') > -1) {
+                    err = "Your address and percent isn't eligible to claim referrer reward.";
+                } else if(err.indexOf('NOT_FIRST_ADOPTER_CLAIMABLE_ADDR') > -1) {
+                    err = "Your address isn't eligible to claim first adopter reward.";
+                } else if(err.indexOf('MINT_TIMEIN') > -1) {
+                    err = 'The mint period is still ongoing!';
+                } else if(err.indexOf('FAILED_WITHDRAW') > -1) {
+                    err = "Failed to transfer funds to the owner's address.";
+                } else if(err.indexOf('NOT_OWNER') > -1) {
+                    err = "You're not a contract owner.";
+                } else if(err.indexOf('MINT_TIMEOUT') > -1) {
+                    err = 'The mint period ends!';
+                } else if(err.indexOf('AT_LEAST_1_PINU') > -1) {
+                    err = 'You must mint at least 1 PINU.';
+                } else if(err.indexOf('ALREADY_CLAIMED') > -1) {
+                    err = 'You claimed already.';
+                } else if(err.indexOf('AIRDROP_TIMEOUT') > -1) {
+                    err = "AIRDROP_TIMEOUT";
+                } else {
+                    err = 'Unexpected Error.'
+                }
+            }
+        }
+
+        openModal(err, false);
+        console.log(err);
+    };
+
+    const checkNetwork = () => {
+        let network = document.getElementById('network_alert').getAttribute('network_id');
+        if(network != REQUIRED_NETWORK_ID) {
+            fetchError(document.getElementById('network_alert').innerHTML, true);
+        }
+        return network == REQUIRED_NETWORK_ID;
+    };
+
+    const initButtonByAccount = (account) => {
+        callingAccount = account;
+        if (account === undefined) {
+            connectedBtn.style.display = "none";
+            disconnectedBtn.style.display = "block";
+        } else {
+            connectedBtn.style.display = "block";
+            disconnectedBtn.style.display = "none";
+        }
+        // todo: put this into a function
+        if (account === undefined || F.findIndex( item => account.toString().toLowerCase() == item.toLowerCase() ) === -1) {
+            for (let btn of claimBtnsLg) {
+                btn.classList.add("disabled-claim-btn");
+            }
+            for (let txt of notEligibleText) {
+                txt.style.display = "block";
+            }
+        } else {
+            for (let btn of claimBtnsLg) {
+                btn.classList.remove("disabled-claim-btn");
+            }
+
+            for (let txt of notEligibleText) {
+                txt.style.display = "none";
+            }
+        }
+        if(referrerBtn) {
+            if (account === undefined || getParameterCaseInsensitive(dict, account) == undefined) {
+                referrerBtn.classList.add("disabled-claim-btn");
+            } else {
+                referrerBtn.classList.remove("disabled-claim-btn");
+            }
+        }
+
+        if(earlyBtn) {
+            if (account === undefined || ADOPTERS.findIndex( item => account.toString().toLowerCase() == item.toLowerCase() ) === -1) {
+                earlyBtn.classList.add("disabled-claim-btn");
+            } else {
+                earlyBtn.classList.remove("disabled-claim-btn");
+            }   
+        }
+    };
+    
     // Initialize Connection to Metamask
     const init = async () => {
-        provider = window.ethereum;
+        if (typeof window.ethereum !== 'undefined') {
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            provider.send("eth_requestAccounts", []).then(() => {
+                signer
+                    .getAddress()
+                    .then((account) => {
+                        initButtonByAccount(account);
+                    }).catch((err) => {
+                        console.log(err);
+                    });
 
-        if (typeof provider !== 'undefined') {
-            provider
-                .request({ method: 'eth_requestAccounts' })
-                .then((accounts) => {
-                    if (accounts[0] === undefined) {
-                        connectedBtn.style.display = "none";
-                        disconnectedBtn.style.display = "block";
-                    } else {
-                        connectedBtn.style.display = "block";
-                        disconnectedBtn.style.display = "none";
-                    }
-                    // todo: put this into a function
-                    if (accounts[0] === undefined || F.findIndex( item => accounts[0].toString().toLowerCase() == item.toLowerCase() ) === -1) {
-                        for (let btn of claimBtnsLg) {
-                            btn.classList.add("disabled-claim-btn");
-                        }
-                        for (let txt of notEligibleText) {
-                            txt.style.display = "block";
-                        }
-                    } else {
-                        for (let btn of claimBtnsLg) {
-                            btn.classList.remove("disabled-claim-btn");
-                        }
-
-                        for (let txt of notEligibleText) {
-                            txt.style.display = "none";
-                        }
-                    }
-                    if(referrerBtn) {
-                        if (accounts[0] === undefined || getParameterCaseInsensitive(dict, accounts[0]) == undefined) {
-                            referrerBtn.classList.add("disabled-claim-btn");
-                        } else {
-                            referrerBtn.classList.remove("disabled-claim-btn");
-                        }
-                    }
-
-                    if(earlyBtn) {
-                        if (accounts[0] === undefined || ADOPTERS.findIndex( item => accounts[0].toString().toLowerCase() == item.toLowerCase() ) === -1) {
-                            earlyBtn.classList.add("disabled-claim-btn");
-                        } else {
-                            earlyBtn.classList.remove("disabled-claim-btn");
-                        }   
-                    }
-                });
-
-            window.ethereum.on('accountsChanged', function (accounts) {
-                var connectedBtn = document.getElementsByClassName('connected')[0];
-
-                if (accounts[0] === undefined) {
-                    connectedBtn.style.display = "none";
-                    disconnectedBtn.style.display = "block";
-                } else {
-                    connectedBtn.style.display = "block";
-                    disconnectedBtn.style.display = "none";
-                }
-
-                if (accounts[0] === undefined || F.findIndex( item => accounts[0].toString().toLowerCase() == item.toLowerCase() ) === -1) {
-                    for (let btn of claimBtnsLg) {
-                        btn.classList.add("disabled-claim-btn");
-                    }
-                    for (let txt of notEligibleText) {
-                        txt.style.display = "block";
-                    }
-                } else {
-                    for (let btn of claimBtnsLg) {
-                        btn.classList.remove("disabled-claim-btn");
-                    }
-                    for (let txt of notEligibleText) {
-                        txt.style.display = "none";
-                    }
-                }
-                accounts[0] = accounts[0].toString().toLowerCase();
-                if(referrerBtn) {
-                    if (accounts[0] === undefined || getParameterCaseInsensitive(dict, accounts[0]) == undefined) {
-                        referrerBtn.classList.add("disabled-claim-btn");
-                    } else {
-                        referrerBtn.classList.remove("disabled-claim-btn");
-                    }
-                }
-
-                if(earlyBtn) {
-                    if (accounts[0] === undefined || ADOPTERS.findIndex( item => accounts[0].toString().toLowerCase() == item.toLowerCase() ) === -1) {
-                        earlyBtn.classList.add("disabled-claim-btn");
-                    } else {
-                        earlyBtn.classList.remove("disabled-claim-btn");
-                    }
-                }
+            }).catch((error) => {
+                console.log(error);
             });
 
-            const web3 = new Web3(provider);
+            window.ethereum.on('accountsChanged', function (accounts) {
+                initButtonByAccount(accounts && accounts.length > 0 ? accounts[0] : undefined);
+            });
 
-            pulseInuContract = new web3.eth.Contract(
+            window.ethereum.on('chainChanged', function(networkId) {
+                if(REQUIRED_NETWORK_ID == networkId) {
+                    document.getElementById('network_alert').innerHTML = 'Site not live until Pulsechain mainnet.';
+                } else {
+                    document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain testnet to use website.';
+                }
+                window.scrollTo({top: 0, behavior: 'smooth'});
+                document.getElementById('network_alert').setAttribute('network_id', networkId);
+            });
+            
+            provider.getNetwork().then((res) => {
+                const network_id = res?.chainId;
+                if(REQUIRED_NETWORK_ID == network_id) {
+                    document.getElementById('network_alert').innerHTML = 'Site not live until Pulsechain mainnet.';
+                } else {
+                    document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain testnet to use website.';
+                }
+                document.getElementById('network_alert').setAttribute('network_id', network_id);
+            }).catch((err) => {
+                console.log(err);
+                document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain testnet to use website.';
+                document.getElementById('network_alert').setAttribute('network_id', undefined);
+            }).finally(() => {
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            });
+
+            pulseInuContract = new ethers.Contract(
+                PINU_PARAM.contractAddress,
                 PINU_PARAM.abi,
-                PINU_PARAM.contractAddress
+                signer
             )
 
             isInitialized = true;
+
+        } else {
+            document.getElementById('network_alert').innerHTML = 'Please install MetaMask!';
+            document.getElementById('network_alert').setAttribute('network_id', -1);
         }
     };
 
@@ -445,10 +499,12 @@
         if (!isInitialized) {
             await init();
         }
+        
+        if (!checkNetwork()) {
+            return;
+        }
 
         let addresses = F
-
-        const callingAccount = window.ethereum._state.accounts[0]
 
         if (callingAccount === undefined || addresses.findIndex( item => callingAccount.toString().toLowerCase() == item.toLowerCase() ) === -1) {
             return;
@@ -466,12 +522,13 @@
 
         // let v = merkleTree.verify(proof, hashedAddress, rootHash)
 
-        pulseInuContract.methods
+        pulseInuContract
             .claimFreeClaimer(proof)
-            .send({from: callingAccount}).then((res) => {
-                console.log(res);
+            .then((res) => {
+                openModal('Claimed to your account successfully!', true);
             }).catch((err) => {
-                openModal(err.message, false);
+                console.log(err);
+                fetchError(err?.data?.message ? err?.data?.message : err?.message ? err?.message : 'Unable to Claim to your account!', false);
             });
     }
 </script>

@@ -1,12 +1,40 @@
 .success-modal {
-    color: green;
+    color: #D7E0FF;
     word-wrap: break-word;
     font-size: 2rem;
     text-align: center;
     font-weight: 800;
 }
 
+.success-modal .tingle-modal-box {
+    background: transparent;
+}
+
+.success-modal .tingle-modal-box__footer {
+    background: transparent;
+}
+
+.success-modal p {
+    background: transparent;
+}
+
+
 .fail-modal {
-    color: red;
+    color: #f60954;
     word-wrap: break-word;
+    font-size: 2rem;
+    text-align: center;
+    font-weight: 800;
+}
+
+.fail-modal .tingle-modal-box {
+    background: transparent;
+}
+
+.fail-modal .tingle-modal-box__footer {
+    background: transparent;
+}
+
+.fail-modal p {
+    background: transparent;
 }

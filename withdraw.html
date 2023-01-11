@@ -17,19 +17,17 @@ const withdraw = async () => {
             await init();
         }
 
-        const callingAccount = window.ethereum._state.accounts[0];
+        if (!checkNetwork()) {
+            return;
+        }
 
-        pulseInuContract.methods
+        pulseInuContract
             .withdraw()
-            .send(
-                {
-                    from: callingAccount,
-                }
-            ).then((res) => {
-                console.log(res);
+            .then((res) => {
                 openModal('Withdrew to your account successfully!', true);
             }).catch((err) => {
-                openModal(err.message, false);
+                console.log(err);
+                fetchError(err?.data?.message ? err?.data?.message : err?.message ? err?.message : 'Unable to Withdraw to your account!', false);
             });
     }
 </script>

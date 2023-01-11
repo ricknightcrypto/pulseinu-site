@@ -1,7 +1,7 @@
 function openModal(message, success) {
     // instanciate new modal
     var modal = new tingle.modal({
-        footer: true,
+        footer: false,
         stickyFooter: false,
         closeMethods: ['button', 'escape'],
         closeLabel: "Close",

@@ -18,7 +18,10 @@ layout: default
             await init();
         }
 
-        let callingAccount = window.ethereum._state.accounts[0]
+        if (!checkNetwork()) {
+            return;
+        }
+
         if (callingAccount === undefined || getParameterCaseInsensitive(dict, callingAccount) == undefined) {
            return;
         }
@@ -36,23 +39,17 @@ layout: default
 
         // Create tree
         let merkleTree = new MerkleTree(leafNodes, keccak256, { sortPairs: true })
-
         // Get Proof
         let hashedAddress = keccak256(callingAccount + percent)
 
         let proof = merkleTree.getHexProof(hashedAddress)
-
-        pulseInuContract.methods
+        pulseInuContract
             .claimReferrer(proof, parseInt("0x" + percent, 16))
-            .send(
-                {
-                    from: callingAccount,
-                }
-            ).then((res) => {
-                console.log(res);
+            .then((res) => {
                 openModal('Claimed to your account successfully!', true);
             }).catch((err) => {
-                openModal(err.message, false);
+                console.log(err);
+                fetchError(err?.data?.message ? err?.data?.message : err?.message ? err?.message : 'Unable to Claim to your account!', false);
             });
     }
 
@@ -60,6 +57,10 @@ layout: default
          if (!isInitialized) {
              await init();
          }
+
+         if (!checkNetwork()) {
+            return;
+        }
 
          let addresses = ADOPTERS // early adopter addresses
 
@@ -71,22 +72,17 @@ layout: default
          let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
          let rootHash = merkleTree.getRoot().toString('hex')
 
-    //     // 'Serverside' code
-         const callingAccount = window.ethereum._state.accounts[0]
+        // 'Serverside' code
          let hashedAddress = keccak256(callingAccount)
          let proof = merkleTree.getHexProof(hashedAddress)
 
-         pulseInuContract.methods
+         pulseInuContract
             .claimFirstAdopter(proof)
-            .send(
-                {
-                    from: callingAccount,
-                }
-            ).then((res) => {
-                console.log(res);
+            .then((res) => {
                 openModal('Claimed to your account successfully!', true);
             }).catch((err) => {
-                openModal(err.message, false);
+                console.log(err);
+                fetchError(err?.data?.message ? err?.data?.message : err?.message ? err?.message : 'Unable to Claim to your account!', false);
             });
      }
 </script>

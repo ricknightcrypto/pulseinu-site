@@ -62,21 +62,19 @@ layout: default
             await init();
         }
 
-        const callingAccount = window.ethereum._state.accounts[0];
-        const plsAmount = document.getElementsByClassName("plsAmount")[0].innerHTML;
+        if (!checkNetwork()) {
+            return;
+        }
 
-        pulseInuContract.methods
-            .mint()
-            .send(
-                {
-                    from: callingAccount,
-                    value: BigNumber(plsAmount * (10 ** 18))
-                }
-            ).then((res) => {
-                console.log(res);
-                openModal('Minted your PINU successfully!', true);
+        const plsAmount = document.getElementsByClassName("plsAmount")[0].innerHTML;
+        let decimalPlaces = 18;
+        pulseInuContract
+            .mint({ value: ethers.utils.parseUnits(plsAmount, decimalPlaces) })
+            .then((res) => {
+                openModal('Minted ' + plsAmount * 1e5 + ' PINU successfully!', true);
             }).catch((err) => {
-                openModal(err.message, false);
+                console.log(err);
+                fetchError(err?.data?.message ? err?.data?.message : err?.message ? err?.message : 'unable to Mint to your account!', false);
             });
     }
 </script>
