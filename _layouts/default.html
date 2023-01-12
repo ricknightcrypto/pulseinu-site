@@ -312,10 +312,12 @@
 </html>
 
 <script>
-    let REQUIRED_NETWORK_ID = 941;
-    let REQUIRED_NETWORK_NAME = 'Pulsechain';
-    let REQUIRED_NETWORK = 'testnet';
-
+    const REQUIRED_NETWORK_ID = 941;
+    const REQUIRED_RPC_URL = 'https://rpc.v2b.testnet.pulsechain.com';
+    const REQUIRED_NETWORK_NAME = 'Pulsechain';
+    const REQUIRED_NETWORK = 'testnet';
+    const REQUIRED_SYMBOL = 'tPLS';
+    const REQUIRED_BLOCK_EXPLORER_URL = "https://scan.v2b.testnet.pulsechain.com";
 
     let pulseInuContract;
     let callingAccount;
@@ -345,7 +347,9 @@
 
     const fetchError = (err, nocheck = false) => {
         if(!nocheck) {
-            if(err.indexOf('User denied transaction signature.') > -1 || err.indexOf('loadingDefaults') > -1) {
+            if(err.indexOf('wallet_switchEthereumChain') > -1) {
+                err = 'Switch Request is already pending.';
+            } else if(err.indexOf('User denied transaction signature.') > -1 || err.indexOf('loadingDefaults') > -1) {
                 err = 'User denied transaction.';
             } else {
                 if(err.indexOf('NOT_AIRDROP_CLAIMABLE_ADDR') > -1) {
@@ -378,9 +382,9 @@
         console.log(err);
     };
 
-    const checkNetwork = () => {
+    const checkNetwork = (bShow = true) => {
         let network = document.getElementById('network_alert').getAttribute('network_id');
-        if(network != REQUIRED_NETWORK_ID) {
+        if(network != REQUIRED_NETWORK_ID && bShow) {
             fetchError(document.getElementById('network_alert').innerHTML, true);
         }
         return network == REQUIRED_NETWORK_ID;
@@ -408,7 +412,6 @@
         const airdropEndTime = Number(contractInfo?.airdropEndTime?._hex) * 1000;
         const currentTime = new Date().getTime();
         const mintEndTime = Number(contractInfo?.mintEndTime?._hex) * 1000;
-        callingAccount = account;
         if (account === undefined) {
             connectedBtn.style.display = "none";
             disconnectedBtn.style.display = "block";
@@ -417,10 +420,14 @@
             disconnectedBtn.style.display = "none";
         }
         // todo: put this into a function
-        if (!isInitialized || !contractInfo || account === undefined || F.findIndex( item => account.toString().toLowerCase() == item.toLowerCase() ) === -1) {
+        if (!checkNetwork(false) || !isInitialized || !contractInfo || account === undefined || F.findIndex( item => account.toString().toLowerCase() == item.toLowerCase() ) === -1) {
             for (let btn of claimBtnsLg) {
                 btn.classList.add("disabled-claim-btn");
                 btn.disabled = true;
+                if(account === undefined || F.findIndex( item => account.toString().toLowerCase() == item.toLowerCase() ) === -1) {
+                    btn.nextSibling.nextSibling.innerHTML = '<p class="not-eligible-text">Not Eligible For Claim Airdrop</p>';
+                    btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
+                }
             }
             for (let txt of notEligibleText) {
                 txt.style.display = "block";
@@ -434,8 +441,13 @@
                     btn.classList.remove("disabled-claim-btn");
                     btn.disabled = false;
                 }
-                btn.nextSibling.nextSibling.innerHTML = 'Ends in';
-                btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(airdropEndTime - currentTime);
+                if(airdropEndTime <= currentTime) {
+                    btn.nextSibling.nextSibling.innerHTML = 'Ended';
+                    btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
+                } else {
+                    btn.nextSibling.nextSibling.innerHTML = 'Ends in';
+                    btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(airdropEndTime - currentTime);
+                }
             }
 
             for (let txt of notEligibleText) {
@@ -443,10 +455,14 @@
             }
         }
 
-        if (!isInitialized || !contractInfo || account === undefined) {
+        if (!checkNetwork(false) || !isInitialized || !contractInfo || account === undefined) {
             for (let btn of mintBtns) {
                 btn.classList.add("disabled-claim-btn");
                 btn.disabled = true;
+                if(account === undefined) {
+                    btn.nextSibling.nextSibling.innerHTML = '<p class="not-eligible-text">Not Eligible For Mint</p>';
+                    btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
+                }
             }
         } else {
             for (let btn of mintBtns) {
@@ -457,8 +473,13 @@
                     btn.classList.remove("disabled-claim-btn");
                     btn.disabled = false;
                 }
-                btn.nextSibling.nextSibling.innerHTML = 'Ends in';
-                btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(mintEndTime - currentTime);
+                if(mintEndTime <= currentTime) {
+                    btn.nextSibling.nextSibling.innerHTML = 'Ended';
+                    btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
+                } else {
+                    btn.nextSibling.nextSibling.innerHTML = 'Ends in';
+                    btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(mintEndTime - currentTime);
+                }
             }
 
             for (let txt of notEligibleText) {
@@ -467,10 +488,15 @@
         }
 
         if(referrerBtn) {
-            if (!isInitialized || !contractInfo || account === undefined || getParameterCaseInsensitive(dict, account) == undefined) {
+            if (!checkNetwork(false) || !isInitialized || !contractInfo || account === undefined || getParameterCaseInsensitive(dict, account) == undefined) {
                 referrerBtn.classList.add("disabled-claim-btn");
                 referrerBtn.disabled = true;
+                if(account === undefined || getParameterCaseInsensitive(dict, account) == undefined) {
+                    referrerBtn.nextSibling.nextSibling.innerHTML = '<p class="not-eligible-text">Not Eligible For Referrer</p>';
+                    referrerBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
+                }
             } else {
+                console.log(mintEndTime > currentTime);
                 if(mintEndTime > currentTime) {
                     referrerBtn.classList.add("disabled-claim-btn");
                     referrerBtn.disabled = true;
@@ -478,32 +504,25 @@
                     referrerBtn.classList.remove("disabled-claim-btn");
                     referrerBtn.disabled = false;
                 }
-                referrerBtn.nextSibling.nextSibling.innerHTML = 'Starts in';
-                referrerBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(mintEndTime - currentTime);
-            }
-        }
-
-        if(withdrawBtn) {
-            if (!isInitialized || !contractInfo || account === undefined || getParameterCaseInsensitive(dict, account) == undefined) {
-                withdrawBtn.classList.add("disabled-claim-btn");
-                withdrawBtn.disabled = true;
-            } else {
-                if(mintEndTime > currentTime) {
-                    withdrawBtn.classList.add("disabled-claim-btn");
-                    withdrawBtn.disabled = true;
+             
+                if(mintEndTime <= currentTime) {
+                    referrerBtn.nextSibling.nextSibling.innerHTML = '';
+                    referrerBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
                 } else {
-                    withdrawBtn.classList.remove("disabled-claim-btn");
-                    withdrawBtn.disabled = false;
+                    referrerBtn.nextSibling.nextSibling.innerHTML = 'Starts in';
+                    referrerBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(mintEndTime - currentTime);
                 }
-                withdrawBtn.nextSibling.nextSibling.innerHTML = 'Possible in';
-                withdrawBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(mintEndTime - currentTime);
             }
         }
 
         if(earlyBtn) {
-            if (!isInitialized || !contractInfo || account === undefined || ADOPTERS.findIndex( item => account.toString().toLowerCase() == item.toLowerCase() ) === -1) {
+            if (!checkNetwork(false) || !isInitialized || !contractInfo || account === undefined || ADOPTERS.findIndex( item => account.toString().toLowerCase() == item.toLowerCase() ) === -1) {
                 earlyBtn.classList.add("disabled-claim-btn");
                 earlyBtn.disabled = true;
+                if(account === undefined || ADOPTERS.findIndex( item => account.toString().toLowerCase() == item.toLowerCase())) {
+                    earlyBtn.nextSibling.nextSibling.innerHTML = '<p class="not-eligible-text">Not Eligible For Early Adopter</p>';
+                    earlyBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
+                }
             } else {
                 if(mintEndTime > currentTime) {
                     earlyBtn.classList.add("disabled-claim-btn");
@@ -512,10 +531,42 @@
                     earlyBtn.classList.remove("disabled-claim-btn");
                     earlyBtn.disabled = false;
                 }
-                earlyBtn.nextSibling.nextSibling.innerHTML = 'Starts in';
-                earlyBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(mintEndTime - currentTime);
+                if(mintEndTime <= currentTime) {
+                    earlyBtn.nextSibling.nextSibling.innerHTML = '';
+                    earlyBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
+                } else {
+                    earlyBtn.nextSibling.nextSibling.innerHTML = 'Starts in';
+                    earlyBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(mintEndTime - currentTime);
+                }
             }   
         }
+
+        if(withdrawBtn) {
+            if (!checkNetwork(false) || !isInitialized || !contractInfo || account === undefined) {
+                withdrawBtn.classList.add("disabled-claim-btn");
+                withdrawBtn.disabled = true;
+                if(account === undefined) {
+                    withdrawBtn.nextSibling.nextSibling.innerHTML = '<p class="not-eligible-text">Not Eligible For Withdraw</p>';
+                    withdrawBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
+                }
+            } else {
+                if(mintEndTime > currentTime) {
+                    withdrawBtn.classList.add("disabled-claim-btn");
+                    withdrawBtn.disabled = true;
+                } else {
+                    withdrawBtn.classList.remove("disabled-claim-btn");
+                    withdrawBtn.disabled = false;
+                }
+                if(mintEndTime <= currentTime) {
+                    withdrawBtn.nextSibling.nextSibling.innerHTML = '';
+                    withdrawBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
+                } else {
+                    withdrawBtn.nextSibling.nextSibling.innerHTML = 'Possible in';
+                    withdrawBtn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(mintEndTime - currentTime);
+                }
+            }
+        }
+
     };
 
     const getContractInfo = () => {
@@ -527,6 +578,25 @@
                 console.log(err);
             });
     };
+
+    const handleAccountsChanged = (accounts) => {
+        callingAccount = accounts && accounts.length > 0 ? accounts[0] : undefined;
+        initButtonByAccount(callingAccount);
+    };
+
+    const handleChainChanged = (networkId) => {
+        console.log(networkId);
+        if(REQUIRED_NETWORK_ID == networkId) {
+            document.getElementById('network_alert').innerHTML = 'Site not live until Pulsechain mainnet.';
+        } else {
+            document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain testnet to use website.(<a>Switch</a>)';
+        }
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        document.getElementById('network_alert').setAttribute('network_id', parseInt(networkId));
+        if(checkNetwork(false)) {
+            init();
+        }
+    };
     
     // Initialize Connection to Metamask
     const init = async () => {
@@ -537,8 +607,9 @@
                 signer
                     .getAddress()
                     .then((account) => {
+                        callingAccount = account
                         countInterval = setInterval(() => {
-                            initButtonByAccount(account);
+                            initButtonByAccount(callingAccount);
                         }, 1000);
                     }).catch((err) => {
                         console.log(err);
@@ -546,33 +617,31 @@
 
             }).catch((error) => {
                 console.log(error);
+                callingAccount = undefined
+                countInterval = setInterval(() => {
+                    initButtonByAccount(callingAccount);
+                }, 1000);
             });
 
-            window.ethereum.on('accountsChanged', function (accounts) {
-                initButtonByAccount(accounts && accounts.length > 0 ? accounts[0] : undefined);
-            });
+            window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
 
-            window.ethereum.on('chainChanged', function(networkId) {
-                if(REQUIRED_NETWORK_ID == networkId) {
-                    document.getElementById('network_alert').innerHTML = 'Site not live until Pulsechain mainnet.';
-                } else {
-                    document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain testnet to use website.';
-                }
-                window.scrollTo({top: 0, behavior: 'smooth'});
-                document.getElementById('network_alert').setAttribute('network_id', parseInt(networkId));
-            });
+            window.ethereum.removeListener('chainChanged', handleChainChanged);
+
+            window.ethereum.on('accountsChanged', handleAccountsChanged);
+
+            window.ethereum.on('chainChanged', handleChainChanged);
             
             provider.getNetwork().then((res) => {
                 const network_id = res?.chainId;
                 if(REQUIRED_NETWORK_ID == network_id) {
                     document.getElementById('network_alert').innerHTML = 'Site not live until Pulsechain mainnet.';
                 } else {
-                    document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain testnet to use website.';
+                    document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain testnet to use website.(<a>Switch</a>)';
                 }
                 document.getElementById('network_alert').setAttribute('network_id', network_id);
             }).catch((err) => {
                 console.log(err);
-                document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain testnet to use website.';
+                document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain testnet to use website.(<a>Switch</a>)';
                 document.getElementById('network_alert').setAttribute('network_id', undefined);
             }).finally(() => {
                 window.scrollTo({top: 0, behavior: 'smooth'});
@@ -591,6 +660,28 @@
             document.getElementById('network_alert').setAttribute('network_id', -1);
         }
     };
+
+
+    document.getElementById('network_alert').addEventListener('click', () => {
+        if(!checkNetwork(false) && window.ethereum) {
+            window.ethereum.request({
+                method: "wallet_addEthereumChain",
+                params: [{
+                    chainId: `0x${Number(REQUIRED_NETWORK_ID).toString(16)}`,
+                    rpcUrls: [REQUIRED_RPC_URL],
+                    chainName: REQUIRED_NETWORK_NAME,
+                    nativeCurrency: {
+                        name: REQUIRED_SYMBOL,
+                        symbol: REQUIRED_SYMBOL,
+                        decimals: 18
+                    },
+                    blockExplorerUrls: [REQUIRED_BLOCK_EXPLORER_URL]
+                }]
+            }).then(res => {}).catch((error) => {
+                fetchError(error.message)
+            });
+        }
+    });
 
     init();
 
