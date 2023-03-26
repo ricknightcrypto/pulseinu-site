@@ -595,12 +595,14 @@
         document.getElementById('network_alert').setAttribute('network_id', parseInt(networkId));
         if(checkNetwork(false)) {
             init();
+            getContractInfo();
         }
     };
     
     // Initialize Connection to Metamask
     const init = async () => {
         if (typeof window.ethereum !== 'undefined') {
+            isInitialized = false;
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             provider.send("eth_requestAccounts", []).then(() => {
@@ -654,7 +656,6 @@
             )
 
             isInitialized = true;
-            getContractInfo();
         } else {
             document.getElementById('network_alert').innerHTML = 'Please install MetaMask!';
             document.getElementById('network_alert').setAttribute('network_id', -1);
@@ -684,6 +685,7 @@
     });
 
     init();
+    getContractInfo();
 
     /***
      * claimToken
