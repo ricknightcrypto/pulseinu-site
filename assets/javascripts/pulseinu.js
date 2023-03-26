@@ -1,6 +1,6 @@
 const PINU_PARAM = {
   contractName: "PulseInu",
-  contractAddress: "0x3d2523D76f145e66784298b7EF23aE56D744F07F",
+  contractAddress: "0xa367b6Dde12c3A38bcEc4177727D97Ff63e4B3F0",
   abi: [
     {
       "inputs": [
