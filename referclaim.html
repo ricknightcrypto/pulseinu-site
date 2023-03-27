@@ -27,6 +27,9 @@ layout: default
             return;
         }
 
+        Spinner();
+        Spinner.show();
+
         // Get Percent
         let percent = getParameterCaseInsensitive(dict, callingAccount)
         if(percent == undefined) {
@@ -54,6 +57,8 @@ layout: default
             }).catch((err) => {
                 console.log(err);
                 fetchError(err?.data?.message ? err?.data?.message : err?.message ? err?.message : 'Unable to Claim to your account!', false);
+            }).finally(() => {
+                Spinner.hide();
             });
     }
 
@@ -62,6 +67,9 @@ layout: default
         if (!checkNetwork()) {
             return;
         }
+
+        Spinner();
+        Spinner.show();
 
         let addresses = ADOPTERS // early adopter addresses
 
@@ -84,6 +92,8 @@ layout: default
         }).catch((err) => {
             console.log(err);
             fetchError(err?.data?.message ? err?.data?.message : err?.message ? err?.message : 'Unable to Claim to your account!', false);
+        }).finally(() => {
+            Spinner.hide();
         });
      }
 </script>

@@ -67,6 +67,9 @@ layout: default
             return;
         }
 
+        Spinner();
+        Spinner.show();
+
         const plsAmount = document.getElementsByClassName("plsAmount")[0].innerHTML;
         let decimalPlaces = 18;
         pulseInuContract
@@ -76,6 +79,8 @@ layout: default
             }).catch((err) => {
                 console.log(err);
                 fetchError(err?.data?.message ? err?.data?.message : err?.message ? err?.message : 'unable to Mint to your account!', false);
+            }).finally(() => {
+                Spinner.hide();
             });
     }
 </script>
