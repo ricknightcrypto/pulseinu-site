@@ -35,6 +35,7 @@ layout: default
         if(percent == undefined) {
             percent = 0;
         }
+        console.log(percent);
 
         const addresses = Object.keys(dict)
 
@@ -46,6 +47,7 @@ layout: default
 
         // Create tree
         let merkleTree = new MerkleTree(leafNodes, keccak256, { sortPairs: true })
+        console.log(merkleTree.getRoot().toString('hex'))
         // Get Proof
         let hashedAddress = keccak256(callingAccount + percent)
 
