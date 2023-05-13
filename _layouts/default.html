@@ -588,9 +588,9 @@
     const handleChainChanged = (networkId) => {
         console.log(networkId);
         if (REQUIRED_NETWORK_ID == networkId) {
-            document.getElementById('network_alert').innerHTML = 'Site not live until Pulsechain mainnet.';
+            // document.getElementById('network_alert').innerHTML = 'Site not live until Pulsechain mainnet.';
         } else {
-            document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain testnet to use website.(<a>Switch</a>)';
+            document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain mainnet to use website.(<a>Switch</a>)';
         }
         window.scrollTo({ top: 0, behavior: 'smooth' });
         document.getElementById('network_alert').setAttribute('network_id', parseInt(networkId));
@@ -637,14 +637,14 @@
             provider.getNetwork().then((res) => {
                 const network_id = res?.chainId;
                 if (REQUIRED_NETWORK_ID == network_id) {
-                    document.getElementById('network_alert').innerHTML = 'Site not live until Pulsechain mainnet.';
+                    // document.getElementById('network_alert').innerHTML = 'Site not live until Pulsechain mainnet.';
                 } else {
-                    document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain testnet to use website.(<a>Switch</a>)';
+                    document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain mainnet to use website.(<a>Switch</a>)';
                 }
                 document.getElementById('network_alert').setAttribute('network_id', network_id);
             }).catch((err) => {
                 console.log(err);
-                document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain testnet to use website.(<a>Switch</a>)';
+                document.getElementById('network_alert').innerHTML = 'Switch to Pulsechain mainnet to use website.(<a>Switch</a>)';
                 document.getElementById('network_alert').setAttribute('network_id', undefined);
             }).finally(() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
