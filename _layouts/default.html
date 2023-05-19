@@ -44,6 +44,7 @@
             color: white;
             font-family: 'Poppins', sans-serif;
             font-display: optional;
+            position: relative;
         }
 
         input {
@@ -108,6 +109,17 @@
             font-weight: bold;
             font-size: 39px;
             margin-top: 4%;
+            color: #D7E0FF;
+        }
+
+        .modal-header {
+            text-align: center;
+            font-weight: bold;
+            text-align: center;
+            font-weight: bold;
+            font-size: 24px;
+            margin-top: 20px;
+            margin-bottom: 0px;
             color: #D7E0FF;
         }
 
@@ -178,6 +190,27 @@
         }
 
         button.mint-btn:hover {
+            box-shadow: none;
+            color: white
+        }
+
+        button.agree-btn {
+            height: 58px;
+            border-radius: 100rem;
+            font-size: 25px;
+            padding: .5rem 3rem;
+            margin-top: 0.2rem;
+            color: white;
+            box-shadow: 0 0 6px 0 rgba(157, 96, 212, 0.5);
+            border: solid 3px transparent;
+            background-image: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, 0)), linear-gradient(0.25turn, #FF0000, #F00F8E, #4F30FF, #00E8FC);
+            background-origin: border-box;
+            background-clip: content-box, border-box;
+            box-shadow: 2px 1000px 1px black inset;
+            font-weight: bold;
+        }
+
+        button.agree-btn:hover {
             box-shadow: none;
             color: white
         }
@@ -284,6 +317,16 @@
                 flex-direction: column;
                 align-items: center;
             }
+
+            .terms-subheader {
+                padding-left: 60px !important;
+                padding-right: 60px !important;
+            }
+
+            .terms-content {
+                padding-left: 60px !important;
+                padding-right: 60px !important;
+            }
         }
 
         @media (max-width: 800px) {
@@ -308,6 +351,24 @@
 
             .benefits-div {
                 flex-direction: column;
+            }
+
+            #terms-modal {
+                width: 80% !important;
+            }
+
+            .terms-subheader {
+                padding-left: 30px !important;
+                padding-right: 30px !important;
+            }
+
+            .terms-content {
+                padding-left: 30px !important;
+                padding-right: 30px !important;
+            }
+
+            .modal-content {
+                font-size: 14px !important;
             }
         }
 
@@ -335,6 +396,66 @@
 
         .mint-promts {
             text-align: left;
+        }
+
+        #terms-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 410px;
+            max-height: 100%;
+            padding: 0px 45px 20px 45px;
+            overflow-y: auto;
+            z-index: 2;
+            text-align: center;
+            background: rgb(56, 61, 81);
+            border-radius: 5px;
+        }
+
+        .modal-content {
+            text-align: left;
+            font-size: 14px;
+            margin-top: 13px;
+            margin-bottom: 13px;
+        }
+
+        .token-terms {
+            color: rgb(46, 186, 198);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .token-terms:hover {
+            color: rgb(0, 0, 0) !important;
+        }
+
+        .terms-subheader {
+            text-align: left;
+            font-size: 28px;
+            font-weight: bold;
+            padding-left: 120px;
+            padding-right: 120px;
+        }
+
+        .terms-content {
+            text-align: left;
+            font-size: 24px;
+            padding-left: 120px;
+            padding-right: 120px;
+        }
+
+        #modal-overlap {
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
@@ -369,6 +490,42 @@
             <button class="connect-btn connected" style="display: none;">Connected</button>
         </div>
     </div>
+    <div id="modal-overlap" class="hidden"></div>
+    <div id="terms-modal" class="modal hidden">
+        <div class="modal-header">
+            Enter App
+        </div>
+        <p class="modal-content">
+            The website is hosted and served on the distributed, peer-to-peer IPFS network.
+        </p>
+        <p class="modal-content">
+            Alternative links can be found in the docs.
+        </p>
+        <p class="modal-content">
+            By clicking Agree you accept the following terms:
+        </p>
+        <p class="modal-content">
+            1. I am not the person or entities who reside in, are citizens of, are incorporated in, or have a
+            registered office in the United States of America or any Prohibited Localities, similar to <span
+                class="token-terms" onclick="goToTokenMintTerms()">Token Mint Terms.<span>
+        </p>
+        <p class="modal-content">
+            2. I will not in the future access this site or use PulseInu dApp while located within the United States
+            or any Prohibited Localities, as defined in the Terms of Use.
+        </p>
+        <p class="modal-content">
+            3. I am not using, and will not in the future use, a VPN to mask my physical location from a restricted
+            territory.
+        </p>
+        <p class="modal-content">
+            4. I am lawfully permitted to access this site and use PulseInu dApp under the laws of the jurisdiction on
+            which I reside and am located.
+        </p>
+        <p class="modal-content">
+            5. I understand the risks associated with entering into using PulseInu protocol.
+        </p>
+        <button onclick="agreeTerms()" class="agree-btn">Agree</button>
+    </div>
     {{ content }}
 </body>
 
@@ -384,7 +541,8 @@
 
     let pulseInuContract;
     let callingAccount;
-    let isInitialized = false
+    let isInitialized = false;
+    let isAgreed = localStorage.getItem("isAgreed");
     let contractInfo;
     let countInterval = null;
     const connectedBtn = document.getElementsByClassName('connected')[0];
@@ -717,15 +875,45 @@
                 PINU_PARAM.contractAddress,
                 PINU_PARAM.abi,
                 signer
-            )
+            );
 
             isInitialized = true;
         } else {
-            document.getElementById('network_alert').innerHTML = 'Please install MetaMask!';
+            const isMobile = navigator.userAgentData.mobile;
+            if (isMobile) {
+                document.getElementById('network_alert').innerHTML = 'Please open with MetaMask!';
+            } else {
+                document.getElementById('network_alert').innerHTML = 'Please install MetaMask!';
+            }
             document.getElementById('network_alert').setAttribute('network_id', -1);
         }
     };
 
+    if (isAgreed === undefined || (isAgreed !== undefined && (new Date() - new Date(isAgreed)) / 360000 > 12)) {
+        if (window.location.pathname !== '/terms') {
+            document.getElementById('terms-modal').classList.remove("hidden");
+            document.getElementById('modal-overlap').classList.remove("hidden");
+            document.getElementById('modal-overlap').style.height = window.innerHeight + "px";
+        }
+    } else {
+        init();
+    }
+
+    const agreeTerms = () => {
+        localStorage.setItem("isAgreed", Date.now());
+        document.getElementById('terms-modal').classList.add("hidden");
+        document.getElementById('modal-overlap').classList.add("hidden");
+        init();
+    }
+
+    const goToTokenMintTerms = () => {
+        window.open("./terms");
+    }
+
+    window.onresize = () => {
+        console.log(window.innerHeight)
+        document.getElementById('modal-overlap').style.height = window.innerHeight + "px";
+    }
 
     document.getElementById('network_alert').addEventListener('click', () => {
         if (!checkNetwork(false) && window.ethereum) {
@@ -748,7 +936,7 @@
         }
     });
 
-    init();
+    // init();
     getContractInfo();
 
     /***
