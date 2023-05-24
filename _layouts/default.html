@@ -454,6 +454,10 @@
             top: 0;
         }
 
+        .address-div {
+            display: flex;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -472,10 +476,13 @@
             </div>
         </a>
         <div class="menu">
+            <div class="address-div">
+                <b id="contract-address"></b>
+                <img width="22" height="22" style="display:block;cursor:pointer;margin-left:5px;" alt="copy" src="assets/images/copyicon.png" onclick="copyToClipboard()"/>
+            </div>
             <a href="/whitepaper.pdf">
                 <b>Whitepaper</b>
             </a>
-
             <a href="https://t.me/+Z5uINrmzvE9lNjNh">
                 <img width="22" style="display:block;" alt="telegram" src="assets/images/telegram.png" />
             </a>
@@ -867,6 +874,8 @@
                 signer
             );
 
+            document.getElementById('contract-address').innerHTML = PINU_PARAM.contractAddress.slice(0, 6) + "...";
+
             isInitialized = true;
         } else {
             const isMobile = navigator.userAgentData.mobile;
@@ -968,5 +977,10 @@
             }).finally(() => {
                 Spinner.hide();
             });
+    }
+
+    const copyToClipboard = () => {
+        // Copy the text inside the text field
+        navigator.clipboard.writeText(PINU_PARAM.contractAddress);
     }
 </script>
