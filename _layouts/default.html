@@ -477,7 +477,7 @@
         </a>
         <div class="menu">
             <div class="address-div">
-                <b id="contract-address"></b>
+                <b id="contract-address">0xa12E...</b>
                 <img width="22" height="22" style="display:block;cursor:pointer;margin-left:5px;" alt="copy" src="assets/images/copyicon.png" onclick="copyToClipboard()"/>
             </div>
             <a href="/whitepaper.pdf">
@@ -550,6 +550,11 @@
     const referrerBtn = document.getElementById('claimReferrer');
     const withdrawBtn = document.getElementById('withdrawBtn');
     const earlyBtn = document.getElementById('earlyAdopter');
+
+    const copyToClipboard = () => {
+        // Copy the text inside the text field
+        navigator.clipboard.writeText("0xa12E2661ec6603CBbB891072b2Ad5b3d5edb48bd");
+    }
 
     /**
      * @param {Object} object
@@ -874,8 +879,6 @@
                 signer
             );
 
-            document.getElementById('contract-address').innerHTML = PINU_PARAM.contractAddress.slice(0, 6) + "...";
-
             isInitialized = true;
         } else {
             const isMobile = navigator.userAgentData.mobile;
@@ -977,10 +980,5 @@
             }).finally(() => {
                 Spinner.hide();
             });
-    }
-
-    const copyToClipboard = () => {
-        // Copy the text inside the text field
-        navigator.clipboard.writeText(PINU_PARAM.contractAddress);
     }
 </script>
