@@ -63,7 +63,7 @@ title: Top 100 Richest Address
 
     pulseInuContract.totalSupply().then((res) => {
         var totalSupply = res / 1e+12;
-        fetch('http://ec2-3-89-19-112.compute-1.amazonaws.com:3000/top-minters')
+        fetch('https://pulseinu.api.nuanchansoft.llc/top-minters')
             .then(response => response.json())
             .then((data, index) => {
                 const tableBody = document.getElementById('rich-table');
