@@ -1,0 +1,164 @@
+---
+layout: default
+title: Top 100 Richest Address
+---
+
+<div class="header">
+    {{ page.title }}
+</div>
+
+
+<div class="table-div">
+    <table id="rich-table" class="rich-table hidden">
+        <thead>
+            <tr class="rich-table-row">
+                <th class="table-header right-align-column">#</th>
+                <th class="table-header left-align-column">Address</th>
+                <th class="table-header right-align-column">Quantity</th>
+                <th class="table-header right-align-column">Percentage</th>
+            </tr>
+        </thead>
+        <tbody id="rich-table">
+        </tbody>
+    </table>
+    <nav id="paginator" aria-label="Page navigation example" class="hidden">
+        <ul class="pagination justify-content-center">
+            <li id="page-1" class="page-item">
+                <a class="page-link" href="javascript:;" onclick="setPage('1')">
+                    <i class="pager-icons fa fa-fast-backward" aria-hidden="true"></i>
+                </a>
+            </li>
+            <li id="page-1" class="page-item">
+                <a class="page-link" href="javascript:;" onclick="setPage('-1')">
+                    <i class="pager-icons fa fa-chevron-left" aria-hidden="true"></i>
+                </a>
+            </li>
+            <li id="page+1" class="page-item">
+                <a class="page-link" href="javascript:;" onclick="setPage('+1')">
+                    <i class="pager-icons fa fa-chevron-right" aria-hidden="true"></i>
+                </a>
+            </li>
+            <li id="page+1" class="page-item">
+                <a class="page-link" href="javascript:;" onclick="setPage('10')">
+                    <i class="pager-icons fa fa-fast-forward" aria-hidden="true"></i>    
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <div id="spinner" class="spinner-border m-5" style="width: 3rem; height: 3rem;" role="status">
+    </div>
+</div>
+
+<script>
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    pulseInuContract = new ethers.Contract(
+        PINU_PARAM.contractAddress,
+        PINU_PARAM.abi,
+        signer
+    );
+
+    var pageNumber = 1, tableDatas = [];
+
+    pulseInuContract.totalSupply().then((res) => {
+        var totalSupply = res / 1e+12;
+        fetch('http://ec2-3-89-19-112.compute-1.amazonaws.com:3000/top-minters')
+            .then(response => response.json())
+            .then((data, index) => {
+                const tableBody = document.getElementById('rich-table');
+                data.forEach((item, index) => {
+                    var quantity = (item.total_amount / 1e+12).toFixed(2);
+                    var percentage = ((quantity / totalSupply) * 100).toFixed(2);
+                    var formatedQty = quantity.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ", ");
+
+                    tableDatas.push({
+                        minter_address: item.minter_address,
+                        formatedQty: formatedQty,
+                        percentage: percentage
+                    });
+
+                    if (index < 10) {
+                        const row = document.createElement('tr');
+                        row.classList.add("rich-table-row");
+                        row.innerHTML = `
+                        <td class="right-align-column" style="width: 50px;">${index + 1}</td>
+                        <td class="left-align-column">
+                            <div class="table-address-div" onhover="onHoverAddress()">
+                                <span class="table-address">${item.minter_address}</span>
+                                <img width="22" height="22" style="cursor: pointer;margin-left: 5px;" alt="copy"
+                                    src="assets/images/copyicon.png" onclick="copyAddressToClipboard('${item.minter_address}')" />
+                            </div>
+                        </td>
+                        <td class="right-align-column">${formatedQty} PINU</td>
+                        <td class="right-align-column" style="width: 150px;">
+                            <p class="percentage-label">${percentage}%</p>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0"
+                                    aria-valuemax="100" style="width:${percentage}%">
+                                </div>
+                            </div>
+                        </td>`;
+                        tableBody.appendChild(row);
+                    }
+                });
+                document.getElementById("spinner").classList.add("hidden");
+                document.getElementById("rich-table").classList.remove("hidden");
+                document.getElementById("paginator").classList.remove("hidden");
+            })
+            .catch(error => {
+                console.error('Error fetching API data:', error);
+            });
+    });
+
+    const copyAddressToClipboard = (address) => {
+        navigator.clipboard.writeText(address);
+    }
+
+    const setPage = (page) => {
+        if (page == "-1") {
+            if (pageNumber != 1) {
+                pageNumber--;
+            }
+        } else if (page == "+1") {
+            if (pageNumber != 10) {
+                pageNumber++;
+            }
+        } else {
+            pageNumber = parseInt(page);
+        }
+        const pageList = document.getElementsByClassName("page-item");
+        for (let i = 0; i < pageList.length; i++) {
+            pageList[i].classList.remove("active");
+        }
+        const richTable = document.getElementById("rich-table");
+        var rowCount = richTable.rows.length;
+        for (var i = 1; i < rowCount; i++) {
+            richTable.deleteRow(1);
+        }
+
+        for (let i = (pageNumber - 1) * 10; i < pageNumber * 10; i++) {
+            const row = document.createElement('tr');
+            row.classList.add("rich-table-row");
+            row.innerHTML = `
+                <td class="right-align-column" style="width: 50px;">${i + 1}</td>
+                <td class="left-align-column">
+                    <div class="table-address-div" onhover="onHoverAddress()">
+                        <span class="table-address">${tableDatas[i].minter_address}</span>
+                        <img width="22" height="22" style="cursor: pointer;margin-left: 5px;" alt="copy"
+                            src="assets/images/copyicon.png" onclick="copyAddressToClipboard('${tableDatas[i].minter_address}')" />
+                    </div>
+                </td>
+                <td class="right-align-column">${tableDatas[i].formatedQty} PINU</td>
+                <td class="right-align-column" style="width: 150px;">
+                    <p class="percentage-label">${tableDatas[i].percentage}%</p>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0"
+                            aria-valuemax="100" style="width:${tableDatas[i].percentage}%">
+                        </div>
+                    </div>
+                </td>`;
+            richTable.appendChild(row);
+        }
+    }
+</script>
