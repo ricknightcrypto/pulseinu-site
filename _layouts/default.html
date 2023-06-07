@@ -433,6 +433,8 @@
             font-size: 14px;
             margin-top: 13px;
             margin-bottom: 13px;
+            background-color: transparent;
+            border: none;
         }
 
         .token-terms {
@@ -996,7 +998,6 @@
             }).finally(() => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             });
-
             pulseInuContract = new ethers.Contract(
                 PINU_PARAM.contractAddress,
                 PINU_PARAM.abi,
@@ -1004,6 +1005,7 @@
             );
 
             isInitialized = true;
+            getContractInfo();
         } else {
             const isMobile = navigator.userAgentData.mobile;
             if (isMobile) {
@@ -1014,12 +1016,12 @@
             document.getElementById('network_alert').setAttribute('network_id', -1);
         }
     };
-
-    if (isAgreed === undefined || (isAgreed !== undefined && (new Date() - new Date(isAgreed)) / 360000 > 12)) {
-        if (window.location.pathname !== '/terms') {
+    if (!isAgreed || (isAgreed && (new Date() - new Date(isAgreed)) / 360000 > 12)) {
+        if (window.location.pathname.indexOf('/terms') === -1) {
             document.getElementById('terms-modal').classList.remove("hidden");
             document.getElementById('modal-overlap').classList.remove("hidden");
             document.getElementById('modal-overlap').style.height = window.innerHeight + "px";
+            document.getElementById('terms-modal').style.display = 'block';
         }
     } else {
         init();
@@ -1062,8 +1064,7 @@
         }
     });
 
-    // init();
-    getContractInfo();
+    init();
 
     /***
      * claimToken

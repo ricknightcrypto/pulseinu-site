@@ -1,4 +1,5 @@
 const PINU_PARAM = {
+  rpcUrl: "https://rpc.pulsechain.com",
   contractName: "PulseInu",
   contractAddress: "0xa12E2661ec6603CBbB891072b2Ad5b3d5edb48bd",
   abi: [

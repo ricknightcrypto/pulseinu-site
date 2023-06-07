@@ -51,12 +51,11 @@ title: Top 100 Richest Address
 
 <script>
 
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+    const provider = new ethers.providers.JsonRpcProvider(PINU_PARAM.rpcUrl);
     pulseInuContract = new ethers.Contract(
         PINU_PARAM.contractAddress,
         PINU_PARAM.abi,
-        signer
+        provider
     );
 
     var pageNumber = 1, tableDatas = [];
