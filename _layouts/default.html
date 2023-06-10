@@ -16,7 +16,6 @@
     <meta name="description" content="SHIB Ecosystem On Pulsechain">
 
     <script aysnc src="assets/javascripts/pulseinu.js"></script>
-    <script src="/assets/javascripts/freeclaim_addresses.min.js"></script>
     <script async src="/assets/javascripts/referrer_addresses.js"></script>
     <script async src="/assets/javascripts/early_adopters.js"></script>
     <script async src="/assets/javascripts/utility_functions.js"></script>
@@ -769,42 +768,55 @@
             connectedBtn.style.display = "block";
             disconnectedBtn.style.display = "none";
         }
-        // todo: put this into a function
-        if (!checkNetwork(false) || !isInitialized || !contractInfo || account === undefined || F.findIndex(item => account.toString().toLowerCase() == item.toLowerCase()) === -1) {
-            for (let btn of claimBtnsLg) {
-                btn.classList.add("disabled-claim-btn");
-                btn.disabled = true;
-                if (account === undefined || F.findIndex(item => account.toString().toLowerCase() == item.toLowerCase()) === -1) {
-                    btn.nextSibling.nextSibling.innerHTML = '<p class="not-eligible-text">Not Eligible For Claim Airdrop</p>';
-                    btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
-                }
-            }
-            for (let txt of notEligibleText) {
-                txt.style.display = "block";
-            }
-        } else {
-            for (let btn of claimBtnsLg) {
-                if (airdropEndTime < currentTime) {
+
+        let accountIndex = -1;
+
+        fetch(`https://pulseinu.api.nuanchansoft.llc/find-claim-address-index?address=${account}`)
+        .then(response => response.json())
+        .then(data => {
+            accountIndex = data.index;
+        }).catch((error) => {
+            console.log(error.message);
+        }).finally(() => {
+            // todo: put this into a function
+            if (!checkNetwork(false) || !isInitialized || !contractInfo || account === undefined || accountIndex === -1) {
+                for (let btn of claimBtnsLg) {
                     btn.classList.add("disabled-claim-btn");
                     btn.disabled = true;
-                } else {
-                    btn.classList.remove("disabled-claim-btn");
-                    btn.disabled = false;
+                    if (account === undefined || accountIndex === -1) {
+                        btn.nextSibling.nextSibling.innerHTML = '<p class="not-eligible-text">Not Eligible For Claim Airdrop</p>';
+                        btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
+                    }
                 }
-                if (airdropEndTime <= currentTime) {
-                    btn.nextSibling.nextSibling.innerHTML = 'Ended';
-                    btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
-                } else {
-                    btn.nextSibling.nextSibling.innerHTML = 'Ends in';
-                    btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(airdropEndTime - currentTime);
+                for (let txt of notEligibleText) {
+                    if(txt.innerText.indexOf('Not Eligible For Claim Airdrop') > -1) {
+                        txt.style.display = "block";
+                    }
+                }
+            } else {
+                for (let btn of claimBtnsLg) {
+                    if (airdropEndTime < currentTime) {
+                        btn.classList.add("disabled-claim-btn");
+                        btn.disabled = true;
+                    } else {
+                        btn.classList.remove("disabled-claim-btn");
+                        btn.disabled = false;
+                    }
+                    if (airdropEndTime <= currentTime) {
+                        btn.nextSibling.nextSibling.innerHTML = 'Ended';
+                        btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
+                    } else {
+                        btn.nextSibling.nextSibling.innerHTML = 'Ends in';
+                        btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = makeTimeString(airdropEndTime - currentTime);
+                    }
+                }
+                for (let txt of notEligibleText) {
+                    if(txt.innerText.indexOf('Not Eligible For Claim Airdrop') > -1) {
+                        txt.style.display = "none";
+                    }
                 }
             }
-
-            for (let txt of notEligibleText) {
-                txt.style.display = "none";
-            }
-        }
-
+        })
         if (!checkNetwork(false) || !isInitialized || !contractInfo || account === undefined) {
             for (let btn of mintBtns) {
                 btn.classList.add("disabled-claim-btn");
@@ -812,6 +824,11 @@
                 if (account === undefined) {
                     btn.nextSibling.nextSibling.innerHTML = '<p class="not-eligible-text">Not Eligible For Mint</p>';
                     btn.nextSibling.nextSibling.nextSibling.nextSibling.innerHTML = '';
+                }
+            }
+            for (let txt of notEligibleText) {
+                if(txt.innerText.indexOf('Not Eligible For Mint') > -1) {
+                    txt.style.display = "block";
                 }
             }
         } else {
@@ -833,7 +850,9 @@
             }
 
             for (let txt of notEligibleText) {
-                txt.style.display = "none";
+                if(txt.innerText.indexOf('Not Eligible For Mint') > -1) {
+                    txt.style.display = "none";
+                }
             }
         }
 
@@ -1077,33 +1096,31 @@
         if (!checkNetwork()) {
             return;
         }
-
         Spinner();
         Spinner.show();
 
-        let addresses = F
+        fetch(`https://pulseinu.api.nuanchansoft.llc/airdrop-markletree?address=${callingAccount}`)
+        .then(response => response.json())
+        .then(data => {
+            let rootHash = data.merkleTree
+            let proof = data.proof;
 
-        // Hash leaves
-        let leaves = addresses.map(addr => keccak256(addr))
+            // let v = merkleTree.verify(proof, hashedAddress, rootHash)
 
-        // Create tree
-        let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
-        let rootHash = merkleTree.getRoot().toString('hex')
-
-        let hashedAddress = keccak256(callingAccount)
-        let proof = merkleTree.getHexProof(hashedAddress)
-
-        // let v = merkleTree.verify(proof, hashedAddress, rootHash)
-
-        pulseInuContract
-            .claimFreeClaimer(proof)
-            .then((res) => {
-                openModal('Claimed to your account successfully!', true);
-            }).catch((err) => {
-                console.log(err);
-                fetchError(err?.data?.message ? err?.data?.message : err?.message ? err?.message : 'Unable to Claim to your account!', false);
-            }).finally(() => {
-                Spinner.hide();
-            });
+            pulseInuContract
+                .claimFreeClaimer(proof)
+                .then((res) => {
+                    openModal('Claimed to your account successfully!', true);
+                }).catch((err) => {
+                    console.log(err);
+                    fetchError(err?.data?.message ? err?.data?.message : err?.message ? err?.message : 'Unable to Claim to your account!', false);
+                }).finally(() => {
+                    Spinner.hide();
+                });
+        }).catch((error) => {
+            fetchError(error?.data?.message ? error?.data?.message : error?.message ? error?.message : 'Unable to Claim to your account!', false);
+        }).finally(() => {
+            Spinner.hide();
+        })
     }
 </script>

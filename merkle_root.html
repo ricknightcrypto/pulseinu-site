@@ -15,15 +15,18 @@ layout: default
 <script>
 
     const airdropMerkle = async () => {
+        Spinner();
+        Spinner.show();
 
-        let addresses = F
-
-        // Hash leaves
-        let leaves = addresses.map(addr => keccak256(addr))
-
-        // Create tree
-        let merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true })
-        openModal(merkleTree.getRoot().toString('hex'), true);
+        fetch('https://pulseinu.api.nuanchansoft.llc/airdrop-markletree?address=0x18757C4Cd0d5DabAF86bC979Bac238cBEcBE964c')
+        .then(response => response.json())
+        .then(data => {
+            openModal(data.merkleTree, true);
+        }).catch((error) => {
+            console.log(error.message);
+        }).finally(() => {
+            Spinner.hide();
+        })
     }
 
     const referrerMerkle = async () => {
